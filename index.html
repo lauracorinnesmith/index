@@ -1,4 +1,6 @@
-<html lang="en"><head>
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#120c08">
@@ -8,8 +10,8 @@
 <meta property="og:title" content="Laura Corinne Smith">
 <meta property="og:description" content="Investigator, intelligence analyst and founder. Walk around the cabin.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&amp;family=Press+Start+2P&amp;family=UnifrakturMaguntia&amp;family=VT323&amp;display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Press+Start+2P&family=UnifrakturMaguntia&family=VT323&display=swap">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Laura Corinne Smith",
 "jobTitle":["Founder & CEO, Kairos Forensics","Research Director, Khthon","Principal, Beale Investigations"],
@@ -201,6 +203,18 @@ footer{position:relative}
 .pbtn.primary{background:#5a1a12;border-color:#8a2a22}
 .ec.casecard{border-top-color:#2a6ad0;background:#f3ecdc repeating-linear-gradient(transparent 0 26px,#e8c8c0 26px 27px)}
 .ec .stampc{position:absolute;right:10px;bottom:12px;border:3px solid #b0331f;color:#b0331f;font-family:var(--pix);font-size:10px;padding:3px 6px;transform:rotate(-10deg)}
+#fade{position:absolute;inset:0;background:#050302;opacity:0;pointer-events:none;transition:opacity .25s;z-index:6}
+#fade.on{opacity:1}
+.steps{font-size:20px;line-height:1.25;padding-left:22px}.steps li.done{color:var(--muted);text-decoration:line-through}.steps li.now{color:var(--amber)}
+.win{margin:10px 0}.winbar{height:14px;background:#1c110a;border:2px solid #6b4a2a}.winbar span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#b0331f,#e8b85a)}
+#winTxt{font-family:var(--pix);font-size:9px;color:var(--amber)}
+.chalk{background:#26302a;color:#dfe4d8;padding:14px 18px;border:8px solid #6b4527;font-family:var(--ret)}.chalk p{font-size:22px!important;margin:0 0 4px}
+.poster{display:block;width:100%;max-width:420px;margin:0 auto;height:auto;box-shadow:6px 6px 0 rgba(0,0,0,.4)}
+.tcscene{width:100%;height:auto;display:block;background:#0e0a07;border:3px solid #4a2e18}
+.tco{cursor:pointer;outline:none}.tco:hover>*:nth-child(2),.tco:focus-visible>*:nth-child(2){filter:drop-shadow(0 0 4px #f0c46a)}
+.tco:focus-visible{outline:2px solid #f0c46a}
+.tcl{font-family:VT323,monospace;font-size:18px;fill:#1c110a}
+.tcmsg{min-height:2.4em}.warn{color:#e8a0a0}
 </style>
 </head>
 <body>
@@ -214,26 +228,27 @@ footer{position:relative}
 </header>
 
 <div id="stageWrap">
-  <canvas id="game" width="640" height="360" aria-label="A log cabin at night. Laura can walk around and examine objects. Use the Facts button for a text version." style="width: 614px; height: 345px;"></canvas>
-  <div id="hover" style="display: none; left: 1378px; top: 444px;">Monstera</div>
+  <canvas id="game" width="640" height="360" aria-label="A log cabin at night. Laura can walk around and examine objects. Use the Facts button for a text version."></canvas>
+  <div id="hover"></div>
+  <div id="fade" aria-hidden="true"></div>
   <div id="bubble" aria-hidden="true"></div>
-  <button id="prompt" style="display: none;"><kbd>E</kbd><span id="promptText">Examine</span></button>
+  <button id="prompt"><kbd>E</kbd><span id="promptText">Examine</span></button>
 </div>
 
 <footer class="box">
   <p id="say" aria-live="polite">The cabin, late. Click anywhere to walk, or click on something to go look at it.</p>
-  <div id="inv"><button id="packBtn" class="hudbtn" aria-haspopup="true" aria-expanded="false" aria-label="Backpack, 0 items" title="Backpack"><img id="packIcon" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAtklEQVR4AayQvQkCQRSE31nBNmAjirCBkWBmbh+CmZFgZmgmmJubCXZgviUsWMDKLI7gLQ73C8PcvTfz8biR9XyGByyWq6RUP3i4CzbbXdofjsl7b14IGWR5yc8FMUbO/3o9kwGT2TyxEUKwIMQcOxnAYReXgPX0ZZACS4AqclcAnHPmPro+xwbxG84ivQCoH4gdi/QCwEVTz4DH/VY1LTDHTgZgiPMgvCshAzHzBVzOp6qNCHgDAAD//90OWuMAAAAGSURBVAMATcyAITBDDL8AAAAASUVORK5CYII="><span id="packSel"></span></button><button id="noteBtn" class="hudbtn" aria-label="Notepad" title="Notepad"><img id="noteIcon" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAtklEQVR4AaSPMQrCQBREf6xsPIONNxC019LSxsreI3gCbyDYBa3sPIGV4DkECzsrbROmmLDLTyYbsjDMwjBvdgfW80SA23RcpCjcjABhkHqPAMvrylIUwiNAGKTeHeBw35rS7zGzT54XHHCA/eJsSq/h06BGgFpHxiK98wtYpDsAVpRYpDuA+j8yFukOoNaRsUh3AKwosUh3AKwosUh3ALWObL272HxzymoBo8kxa9P7+6/KgJQAAAD//7A8OTUAAAAGSURBVAMADXCtIUc5CRkAAAAASUVORK5CYII="><span id="noteDot" hidden=""></span></button>
-    <div id="pack" role="dialog" aria-label="Backpack" hidden="" tabindex="-1"><div class="ptitle">BACKPACK</div><div class="pslots"><p class="empty">Nothing yet. Desks and shelves are worth checking.</p></div></div></div>
+  <div id="inv"><button id="packBtn" class="hudbtn" aria-haspopup="true" aria-expanded="false" aria-label="Backpack" title="Backpack"><img id="packIcon" alt=""><span id="packSel"></span></button><button id="noteBtn" class="hudbtn" aria-label="Notepad" title="Notepad"><img id="noteIcon" alt=""><span id="noteDot" hidden></span></button>
+    <div id="pack" role="dialog" aria-label="Backpack" hidden tabindex="-1"><div class="ptitle">BACKPACK</div><div class="pslots"></div></div></div>
   <div class="keys">WASD / ARROWS · WALK<br>E / SPACE · EXAMINE<br>CLICK · WALK TO</div>
 </footer>
 
 <div id="boardView" role="dialog" aria-modal="true" aria-labelledby="bvTitle">
   <div class="bv-top box"><h2 id="bvTitle">EVIDENCE BOARD</h2><span id="bvCount" class="count"></span><span class="sp"></span><button class="pbtn" id="bvPrint">RÉSUMÉ (PDF)</button><button class="pbtn" id="bvClose">BACK TO CABIN</button></div>
   <div id="bvStage"><div id="bvBoard"></div>
-    <div id="bvDetail" hidden=""><div class="dcard"><div class="dk"></div><div class="dt"></div><div class="db"></div><div class="da acts"></div><button class="pbtn dclose">PUT IT BACK</button></div></div>
+    <div id="bvDetail" hidden><div class="dcard"><div class="dk"></div><div class="dt"></div><div class="db"></div><div class="da acts"></div><button class="pbtn dclose">PUT IT BACK</button></div></div>
   </div>
 </div>
-<div id="printCV"><h1>Laura Corinne Smith</h1><p class="tag">Investigator · Intelligence analyst · Founder</p><p>I trace mass graves, fraud networks and the infrastructure behind both, then document them so they hold up.</p><h2>Roles</h2><h3>Beale Investigations <span>PRINCIPAL · LICENSED PI</span></h3><p>Private investigations for law firms and government-adjacent clients: OSINT, crypto-fraud tracing, impersonation and reputation cases, surveillance, and physical and OPSEC/PERSEC penetration testing. CMMC 2.0 consulting through counsel.</p><p class="u">https://bealeinvestigations.com</p><h3>Kairos Forensics <span>FOUNDER &amp; CEO</span></h3><p>A cryptographic evidence-integrity platform: chain of custody for digital evidence that can be proven, not just asserted, from capture to courtroom.</p><p class="u">https://kairosforensics.com</p><h3>Khthon <span>RESEARCH DIRECTOR</span></h3><p>Leads analysis for mass-grave documentation and war-crimes evidence in more than 30 countries, fusing OSINT, GEOINT/SATINT and HUMINT. Also runs OPSEC/PERSEC monitoring and sanctions screening across the US and UK entities.</p><p class="u">https://khthon.org</p><h2>Selected casework</h2><h3>From the case files <span>SELECTED CASEWORK</span></h3><ul><li>OSINT and geolocation leads on FBI Most Wanted fugitive cases.</li><li>Social-media suspect identification for municipal homicide investigations.</li><li>Missing-persons cases, including parental kidnappings.</li><li>A published investigation extending a DOJ-indicted DPRK IT-worker network through GitHub.</li></ul><p class="u">https://www.linkedin.com/in/lauracorinnesmith</p><h3>Pulling a fraud trace <span>CASE STUDY</span></h3><p>How a crypto-fraud trace comes together, one lead at a time, and what gets preserved at each hop.</p><p class="u"></p><h2>Education &amp; experience</h2><h3>Intelligence analysis <span>EDUCATION &amp; EXPERIENCE</span></h3><p>B.S. Intelligence Analysis, James Madison University. Magna cum laude, Phi Beta Kappa. Threat intelligence at Recorded Future; domain and network analysis as a contractor.</p><p class="u"></p><h2>Writing &amp; code</h2><h3>Substack <span>WRITING</span></h3><p>Long-form investigative writing on mass graves, accountability and the people doing the work.</p><p class="u">https://substack.com/@lauracorinnesmith</p><h3>GitHub <span>TOOLING</span></h3><p>Scripts and tools from the investigative work.</p><p class="u">https://github.com/lauracorinnesmith</p><h2>Off the clock</h2><p>Painting, mycology and foraging, and a food forest in progress.</p><h2>Contact</h2><p>linkedin.com/in/lauracorinnesmith · substack.com/@lauracorinnesmith · github.com/lauracorinnesmith</p><p class="u">Beale Investigations, Virginia DCJS license no. [LICENSE NO.]</p></div>
+<div id="printCV"></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mT">
   <div class="box">
     <button class="x" id="mX" aria-label="Close">X</button>
@@ -436,7 +451,7 @@ var OBJ=[
  {id:'drawer',name:'Desk drawer',box:[484,219,44,18],deskItem:true,spot:[506,264],face:'up'},
  {id:'record',name:'Record player',box:[108,255,46,38],base:292,foot:[110,279,42,14],spot:[172,288],face:'left',draw:drawRecord},
  {id:'globe',name:'Globe',box:[66,184,36,64],base:246,foot:[71,236,26,12],spot:[116,252],face:'left',draw:drawGlobe},
- {id:'monstera',name:'Monstera',box:[556,214,74,138],base:350,foot:[572,338,40,12],spot:[554,344],face:'right',draw:drawMonstera,plant:true},
+ {id:'monstera',name:'Monstera',box:[556,222,47,128],base:350,foot:[572,338,40,12],spot:[554,344],face:'right',draw:drawMonstera,plant:true},
  {id:'zebrina',name:'Purple wandering dude',box:[258,128,36,36],base:162,foot:[264,152,24,10],spot:[276,178],face:'up',draw:drawZebrina,plant:true},
  {id:'pothos',name:'Pothos',box:[502,55,22,21],wall:true,spot:[548,166],face:'up',plant:true},
  {id:'sconce',name:'Wall light',box:[44,130,28,34],wall:true,spot:[82,206],face:'left'},
@@ -651,12 +666,15 @@ function drawPlayer(){
 /* ================= collision + pathfinding ================= */
 function walkable(x,y){
   if(y<BY+8||y>H-5)return false;
-  if(x<leftX(y)+6||x>rightX(y)-6)return false;
+  var LX=leftX(y)+6,RX=rightX(y)-6,inDoor=y>DOOR_Y[0]+2&&y<DOOR_Y[1]-2;if(inDoor&&state.room==='cabin')RX=rightX(y)+3;if(inDoor&&state.room==='kitchen')LX=leftX(y)-3;
+  if(x<LX||x>RX)return false;
+  if(state.room==='kitchen'){var dwx=398+(y-135)*32/225;if(Math.abs(x-dwx)<9&&!(y>265&&y<307))return false;}
   for(var i=0;i<OBJ.length;i++){var f=OBJ[i].foot;if(f&&x>f[0]-5&&x<f[0]+f[2]+5&&y>f[1]-3&&y<f[1]+f[3]+3)return false;}
   return true;
 }
 var GS=6,GW=Math.ceil(W/GS),GH=Math.ceil(H/GS);
-function cellOK(cx,cy){return walkable(cx*GS+GS/2,cy*GS+GS/2);}
+function walkM(x,y){return walkable(x,y)&&walkable(x-3,y)&&walkable(x+3,y)&&walkable(x,y-2)&&walkable(x,y+2);}
+function cellOK(cx,cy){return walkM(cx*GS+GS/2,cy*GS+GS/2);}
 function findPath(sx,sy,tx,ty){
   var s=[Math.floor(sx/GS),Math.floor(sy/GS)],t=[Math.floor(tx/GS),Math.floor(ty/GS)];
   if(!cellOK(t[0],t[1])){var best=null,bd=1e9;for(var dy=-6;dy<=6;dy++)for(var dx=-6;dx<=6;dx++){var c=[t[0]+dx,t[1]+dy];if(cellOK(c[0],c[1])){var d=dx*dx+dy*dy;if(d<bd){bd=d;best=c;}}}if(!best)return null;t=best;tx=t[0]*GS+GS/2;ty=t[1]*GS+GS/2;}
@@ -669,7 +687,7 @@ function findPath(sx,sy,tx,ty){
     if(Object.keys(seen).length>2500)break;}
   return null;
 }
-function clear(x0,y0,x1,y1){var d=Math.hypot(x1-x0,y1-y0),n=Math.ceil(d/3);for(var i=1;i<=n;i++){if(!walkable(x0+(x1-x0)*i/n,y0+(y1-y0)*i/n))return false;}return true;}
+function clear(x0,y0,x1,y1){var d=Math.hypot(x1-x0,y1-y0),n=Math.ceil(d/3);for(var i=1;i<=n;i++){if(!walkM(x0+(x1-x0)*i/n,y0+(y1-y0)*i/n))return false;}return true;}
 function smooth(path,sx,sy){if(!path.length)return path;var out=[],cx=sx,cy=sy,i=0;while(i<path.length){var j=path.length-1;while(j>i&&!clear(cx,cy,path[j][0],path[j][1]))j--;out.push(path[j]);cx=path[j][0];cy=path[j][1];i=j+1;}return out;}
 
 /* ================= input ================= */
@@ -703,6 +721,7 @@ function update(){
     if(walkable(P.x+vx,P.y+vy)){P.x+=vx;P.y+=vy;}else if(walkable(P.x+vx,P.y)){P.x+=vx;}else if(walkable(P.x,P.y+vy)){P.y+=vy;}else{P.path=[];}
     P.ft++;if(P.ft>8){P.ft=0;P.frame=(P.frame+1)%4;}
   } else {P.frame=0;P.ft=0;}
+  checkDoors();
   // nearest interactable
   near=null;var bd=26;INTERACTIVE.forEach(function(o){var d=Math.hypot(o.spot[0]-P.x,o.spot[1]-P.y);if(d<bd){bd=d;near=o;}});if(state.sel==='churu'&&typeof FX!=='undefined'&&Math.hypot(FX.x-P.x,FX.y-P.y)<40)near=FELIX;
   var pr=document.getElementById('prompt');if(near&&!modalOpen()&&!boardOpen()){pr.style.display='flex';document.getElementById('promptText').textContent=near.name;}else pr.style.display='none';
@@ -715,6 +734,7 @@ document.getElementById('prompt').addEventListener('click',tryInteract);
 var parts=[];
 function emit(){
   if(reduce)return;
+  if(state.room==='kitchen'){emitKitchen();return;}
   if(T<state.smokeUntil&&Math.random()<.4)parts.push({k:'smoke',x:384+Math.random()*12,y:118,vx:(Math.random()-.5)*.15,vy:-.25-Math.random()*.2,l:1,d:.008,r:1});
   if(Math.random()<.35*state.fireLvl)parts.push({k:'ember',x:378+Math.random()*24,y:120,vx:(Math.random()-.5)*.25,vy:-.35-Math.random()*.5,l:1,d:.012+Math.random()*.01});
   if(state.lamp&&Math.random()<.12)parts.push({k:'dust',x:431+Math.random()*40,y:182+Math.random()*30,vx:(Math.random()-.5)*.08,vy:-.03-Math.random()*.05,l:1,d:.004});
@@ -725,6 +745,7 @@ function drawParts(){
     if(p.k==='ember'){p.vx+=Math.sin(T/20+i)*.01;if(p.y<CY+50)p.l-=.03;R(p.l>.5?'#ffd07a':'#e0702a',p.x,p.y,1,1);}
     else if(p.k==='dust'){R('rgba(255,230,180,'+(p.l*.8).toFixed(2)+')',p.x,p.y,1,1);}
     else if(p.k==='smoke'){p.r+=.03;var sr=Math.round(p.r);R('rgba(150,145,140,'+(p.l*.35).toFixed(2)+')',p.x-sr,p.y-sr,sr*2+1,sr*2+1);}
+    else if(p.k==='mist'){p.r+=.02;var mr=Math.round(p.r);R('rgba(220,235,245,'+(p.l*.18).toFixed(2)+')',p.x-mr,p.y-mr,mr*2+1,mr*2+1);}
     else if(p.k==='heart'){var hx=Math.round(p.x),hy=Math.round(p.y),hc='#ff7aa8';R(hc,hx,hy,1,1);R(hc,hx+2,hy,1,1);R(hc,hx-1,hy+1,5,1);R(hc,hx,hy+2,3,1);R(hc,hx+1,hy+3,1,1);}
     else if(p.k==='z'){var zx=Math.round(p.x),zy=Math.round(p.y),zc='rgba(220,225,255,'+p.l.toFixed(2)+')';R(zc,zx,zy,3,1);R(zc,zx+1,zy+1,1,1);R(zc,zx,zy+2,3,1);}
     else R('#f0c46a',p.x,p.y,1,1);}
@@ -733,6 +754,7 @@ function drawParts(){
 /* ================= lighting ================= */
 var lt=document.createElement('canvas');lt.width=W;lt.height=H;var lc=lt.getContext('2d');
 function light(){
+  if(state.room==='kitchen'){lightKitchen();return;}
   lc.globalCompositeOperation='source-over';lc.clearRect(0,0,W,H);lc.fillStyle=state.music==='party'?'rgba(8,4,20,.8)':'rgba(10,8,22,.66)';lc.fillRect(0,0,W,H);
   lc.globalCompositeOperation='destination-out';
   var fl=reduce?0:Math.sin(T/7)*6+Math.sin(T/3.1)*3;
@@ -760,9 +782,12 @@ function glow(x,y,r,c){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorSto
 /* ================= render loop ================= */
 function frame(){
   T++;felixUpdate();update();emit();if(hovered&&hovered.cat)placeHover(hovered);placeBubble();
-  g.drawImage(bg,0,0);drawMantel();drawTV();drawWallDecor();drawFire();drawFlies();drawBoardMini();drawSconce();
-  var list=OBJ.filter(function(o){return o.draw;}).map(function(o){return {y:o.base,fn:o.draw};});
-  list.push({y:P.y,fn:drawPlayer});list.sort(function(a,b2){return a.y-b2.y;});list.forEach(function(it){it.fn();});
+  if(state.room==='kitchen'){g.drawImage(bgK,0,0);drawKitchenDecor();}
+  else{g.drawImage(bg,0,0);drawMantel();drawTV();drawWallDecor();drawFire();drawFlies();drawBoardMini();drawSconce();}
+  var list=OBJ.filter(function(o){return o.draw;}).map(function(o){var cx=o.cat?FX.x:(o.box?o.box[0]+o.box[2]/2:200);return {y:o.base,fn:o.draw,x:cx};});
+  list.push({y:P.y,fn:drawPlayer,x:P.x});list.sort(function(a,b2){return a.y-b2.y;});
+  if(state.room==='kitchen'){list.forEach(function(it){if(it.x>dwxAt(it.y))it.fn();});g.drawImage(wallL,0,0);list.forEach(function(it){if(it.x<=dwxAt(it.y))it.fn();});}
+  else list.forEach(function(it){it.fn();});
   light();drawParts();
   var mk=near||null;if(mk&&!reduce){var bx=mk.box[0]+mk.box[2]/2,by=mk.box[1]-6+Math.round(Math.sin(T/10)*1.5);R('#1c110a',bx-2,by-2,6,11);R('#f0c46a',bx-1,by-1,4,5);R('#f0c46a',bx-1,by+5,4,3);}
   requestAnimationFrame(frame);
@@ -817,6 +842,7 @@ function renderFiles(sel){var tabs=Object.keys(FILES).map(function(k){return '<b
 
 function examine(o){
   if(state.sel&&useOn(o))return;
+  if(kitchenExamine(o))return;
   switch(o.id){
   case 'felix':petFelix();return;
   case 'fire':log(o);state.fire=!state.fire;
@@ -840,6 +866,9 @@ function examine(o){
   case 'lamp':state.lamp=!state.lamp;log(o);say(state.lamp?'Lamp on. Better for reading.':'Lamp off. Just the fire now.');return;
   case 'record':log(o);openCrate();return;
   case 'letter':openLetter();return;
+  case 'basket':log(o);state.off.myco=true;var nb=pin('offclock');openModal('THE FORAGING BASKET','<p>Oyster mushrooms and a couple of morels. Off the clock: mycology, and a food forest in progress.</p>'+(nb?'<p class="pinned">📌 Pinned to the evidence board.</p>':'')+'<div class="acts">'+(state.inv.mushroom?'<span class="dim2">You already have one in the backpack.</span>':'<button class="pbtn" id="takeMush">TAKE AN OYSTER MUSHROOM</button>')+'<button class="pbtn" id="toBoard">VIEW ON BOARD</button></div>');
+    var tm=document.getElementById('takeMush');if(tm)tm.addEventListener('click',function(){state.inv.mushroom=true;renderInv();closeModal();say('Laura picks the freshest oyster and tucks it in the backpack.');addNote('Took a fresh oyster mushroom. The still air box in the lab is where it gets cloned.');});
+    document.getElementById('toBoard').addEventListener('click',function(){closeModal();openBoard();});say('Still smells of the woods.');return;
   case 'lockbox':openLockbox();return;
   case 'laptop':log(o);pin('tooling');openTerminal();say('The offline workstation hums awake.');return;
   case 'globe':log(o);pin('khthon');openGlobe();say('The globe turns slowly on its axis.');return;
@@ -1047,11 +1076,13 @@ function buildPrint(){var strip=function(h){return h.replace(/<a [^>]*href="([^"
   h+='<h2>Off the clock</h2><p>Painting, mycology and foraging, and a food forest in progress.</p><h2>Contact</h2><p>linkedin.com/in/lauracorinnesmith · substack.com/@lauracorinnesmith · github.com/lauracorinnesmith</p><p class="u">Beale Investigations, Virginia DCJS license no. [LICENSE NO.]</p>';
   document.getElementById('printCV').innerHTML=h;}
 /* ================= Felix ================= */
-var FX={x:312,y:161,dir:1,state:'sleep',timer:500,path:[],frame:0,ft:0,sleepPoke:0,line:0,mode:'curl'};
+var FX={room:'cabin',x:312,y:161,dir:1,state:'sleep',timer:500,path:[],frame:0,ft:0,sleepPoke:0,line:0,mode:'curl'};
 var FELIX=byId.felix;
 var CAT={G:'#8a8f96',GD:'#6e737b',K:'#1e1e22',W:'#eeeae2',P:'#d98a8a',E:'#9fd36a'};
 function cp(dx,dy,w,h,c){var x=FX.dir>0?FX.x+dx:FX.x-dx-w+1;R(c,x,FX.y+dy,w,h);}
 function drawFelix(){
+  if(FX.room!==state.room)return;
+  if(FX.perch){var sx=FX.x,sy=FX.y;FX.x=63;FX.y=140;FX.perch=false;drawFelix();FX.perch=true;FX.x=sx;FX.y=sy;return;}
   ell('rgba(0,0,0,.4)',FX.x,FX.y,FX.mode==='walk'?11:9,2);
   if(FX.mode==='curl'){var br=Math.sin(T/40)>0?5:4;
     ell(CAT.G,FX.x,FX.y-4,9,br);for(var s=-5;s<=5;s+=3){R(CAT.K,FX.x+s,FX.y-4-br,1,2);R(CAT.K,FX.x+s+1,FX.y-3-br,1,1);}
@@ -1079,15 +1110,16 @@ function drawFelix(){
   cp(9,-11,3,2,CAT.W);cp(11,-12,1,1,CAT.P);cp(9,-13,1,1,CAT.E);
 }
 var CAT_SPOTS=[[200,212],[312,161],[312,161],[466,162],[330,300],[470,300],[150,316],[392,168]];
-function felixGo(x,y){var p=findPath(FX.x,FX.y,x,y);if(p&&p.length){FX.path=p;FX.state='walk';FX.mode='walk';}else{FX.state='sit';FX.mode='sit';FX.timer=300;}}
+function felixGo(x,y){FX.perch=false;var p=findPath(FX.x,FX.y,x,y);if(p&&p.length){FX.path=p;FX.state='walk';FX.mode='walk';}else{FX.state='sit';FX.mode='sit';FX.timer=300;}}
 function felixUpdate(){
+  if(FX.room!==state.room){FELIX.box[0]=-999;FELIX.spot[0]=-999;return;}
   if(FX.state==='walk'){var tg=FX.path[0],dx=tg[0]-FX.x,dy=tg[1]-FX.y,d=Math.hypot(dx,dy),sp=.55;
-    if(d<1){FX.path.shift();if(!FX.path.length){var onRug=Math.hypot(FX.x-200,FX.y-212)<20||Math.hypot(FX.x-312,FX.y-161)<12;if(onRug&&Math.random()<.6&&state.music!=='party'){FX.state='sleep';FX.mode='curl';FX.timer=900+Math.random()*900;}else{FX.state='sit';FX.mode='sit';FX.timer=300+Math.random()*400;}}}
+    if(d<1){FX.path.shift();if(!FX.path.length&&FX.goal==='bowl'){FX.goal=null;FX.state='sit';FX.mode='sit';FX.timer=420;FX.eating=true;FX.dir=-1;say('Felix inhales the kibble.');}else if(!FX.path.length&&state.room==='kitchen'&&Math.hypot(FX.x-96,FX.y-238)<8&&Math.random()<.8){FX.perch=true;FX.state='sleep';FX.mode='curl';FX.timer=900+Math.random()*600;}else if(!FX.path.length){var onRug=Math.hypot(FX.x-200,FX.y-212)<20||Math.hypot(FX.x-312,FX.y-161)<12;if(onRug&&Math.random()<.6&&state.music!=='party'){FX.state='sleep';FX.mode='curl';FX.timer=900+Math.random()*900;}else{FX.state='sit';FX.mode='sit';FX.timer=300+Math.random()*400;}}}
     else{FX.x+=dx/d*sp;FX.y+=dy/d*sp;if(Math.abs(dx)>.3)FX.dir=dx>0?1:-1;if(++FX.ft>12){FX.ft=0;FX.frame++;}}}
-  else{FX.timer--;if(FX.state==='sleep'&&!reduce&&T%110===0)parts.push({k:'z',x:FX.x+8,y:FX.y-12,vx:.12,vy:-.18,l:1,d:.01});
+  else{FX.timer--;if(FX.eating&&FX.timer<=1){FX.eating=false;state.k.food=false;say('Felix licks the bowl clean and looks at you like he hasn\'t eaten in days.');}if(FX.state==='sleep'&&!reduce&&T%110===0)parts.push({k:'z',x:FX.x+8,y:FX.y-12,vx:.12,vy:-.18,l:1,d:.01});
     if(FX.state==='sleep'&&state.music==='party'){FX.state='sit';FX.mode='sit';FX.timer=600;}
-    if(FX.follow&&T<FX.follow&&FX.state!=='sleep'&&FX.timer>60)FX.timer=60;if(FX.timer<=0){var r=Math.random(),t;if((FX.follow&&T<FX.follow)||r<.25)t=[P.x+(P.x<320?22:-22),P.y+2];else t=CAT_SPOTS[Math.floor(Math.random()*CAT_SPOTS.length)];felixGo(t[0],t[1]);}}
-  FELIX.base=FX.y;FELIX.box[0]=FX.x-12;FELIX.box[1]=FX.y-(FX.mode==='curl'?12:22);FELIX.box[2]=24;FELIX.box[3]=FX.mode==='curl'?13:23;
+    if(FX.follow&&T<FX.follow&&FX.state!=='sleep'&&FX.timer>60)FX.timer=60;if(FX.timer<=0){var r=Math.random(),t;if((FX.follow&&T<FX.follow)||r<.25)t=[P.x+(P.x<320?22:-22),P.y+2];else {var SP=state.room==='kitchen'?CAT_SPOTS_K:CAT_SPOTS;t=SP[Math.floor(Math.random()*SP.length)];}felixGo(t[0],t[1]);}}
+  FELIX.base=FX.perch?238:FX.y;FELIX.box[0]=FX.x-12;FELIX.box[1]=FX.y-(FX.mode==='curl'?12:22);FELIX.box[2]=24;FELIX.box[3]=FX.mode==='curl'?13:23;
   FELIX.spot[0]=FX.x+(P.x<FX.x?-18:18);FELIX.spot[1]=FX.y+2;
 }
 var sfx=null;
@@ -1119,13 +1151,17 @@ var INV={key:{name:'Brass key',desc:'Small brass key from the desk drawer. Fits 
          churu:{name:'Churu',desc:'Lickable cat treats. Felix\'s one true weakness.'},
          notes:{name:'Inoculation notes',desc:'Laura\'s mushroom-growing notebook. Click to read.'},
          letter:{name:'CEO\'s letter',desc:'The letter that started the case. Click to reread.'},
-         blueprints:{name:'Blueprints',desc:'Master blueprints and sequencing drives from the lockbox.'}};
+         blueprints:{name:'Blueprints',desc:'Master blueprints and sequencing drives from the lockbox.'},
+         mushroom:{name:'Oyster mushroom',desc:'Fresh from the foraging basket. Take it to the still air box.'},
+         plate:{name:'Agar plate',desc:'Your cloned oyster tissue, sealed and labeled.'}};
 function icon(id){var c=document.createElement('canvas');c.width=16;c.height=16;var x=c.getContext('2d');
   if(id==='key'){R('#7a5a22',2,4,7,7,x);R('#1c110a',4,6,3,3,x);R('#f3d58e',2,4,7,1,x);R('#c9a867',9,7,6,2,x);R('#c9a867',12,9,1,3,x);R('#c9a867',14,9,1,2,x);R('#f3d58e',9,7,6,1,x);}
   else if(id==='churu'){R('#d8d8d8',5,1,3,2,x);R('#f2a33a',5,3,4,3,x);R('#ffffff',5,6,4,5,x);R('#f2a33a',5,11,4,4,x);R('#3a7ad0',5,7,4,2,x);R('#f2a33a',10,4,4,10,x);R('#ffffff',10,7,4,4,x);R('#1c110a',4,1,1,14,x);R('#1c110a',9,3,1,12,x);R('#1c110a',14,4,1,10,x);}
   else if(id==='notes'){R('#2f4a2a',3,2,10,13,x);R('#3f5e38',3,2,10,1,x);R('#1a2a16',3,2,1,13,x);R('#e9dfc2',12,3,1,11,x);R('#c9a867',5,5,6,2,x);R('#efe2c4',6,9,4,1,x);}
   else if(id==='pack'){R('#4a4d54',4,2,8,2,x);R('#7a7d84',2,4,12,11,x);R('#8a8d94',3,4,10,1,x);R('#5a5d64',2,14,12,1,x);R('#6a6d74',4,5,8,5,x);R('#8a8d94',4,5,8,1,x);R('#c9a867',7,8,2,2,x);R('#5a5d64',4,11,8,3,x);R('#3a3d44',1,6,1,7,x);R('#3a3d44',14,6,1,7,x);}
   else if(id==='letter'){R('#efe2c4',1,4,14,9,x);R('#c4b48e',1,4,14,1,x);for(var i=0;i<7;i++){R('#c4b48e',1+i,5+Math.floor(i/2),1,1,x);R('#c4b48e',14-i,5+Math.floor(i/2),1,1,x);}R('#9c3a30',7,8,3,3,x);}
+  else if(id==='mushroom'){R('#c8c0a8',2,4,9,5,x);R('#d8d0b8',6,8,9,5,x);R('#1c110a',2,4,9,1,x);R('#a89e88',4,6,6,1,x);R('#efe6cf',8,12,2,3,x);}
+  else if(id==='plate'){R('#e8f0f4',1,5,14,7,x);R('#e8d070',2,6,12,5,x);R('#ffffff',6,7,4,3,x);R('#1c110a',1,5,14,1,x);R('#b0331f',1,11,14,1,x);}
   else if(id==='blueprints'){R('#2a4a8a',2,2,11,13,x);R('#3a5aa8',2,2,11,1,x);for(var j=4;j<14;j+=3)R('#9ac0f0',4,j,7,1,x);R('#9ac0f0',6,4,1,9,x);R('#c9c9d9',11,10,4,3,x);R('#5a5a6a',12,13,2,2,x);}
   else if(id==='pad'){R('#b0331f',3,1,10,2,x);R('#f3dc6a',3,3,10,12,x);for(var y=5;y<14;y+=2)R('#7a9ac8',4,y,8,1,x);R('#c9a867',12,6,2,8,x);R('#e8a0a0',12,5,2,1,x);R('#1c110a',12,14,1,1,x);}
   return c.toDataURL();}
@@ -1134,15 +1170,15 @@ var pack=document.getElementById('pack'),packBtn=document.getElementById('packBt
 function packOpen(){return !pack.hidden;}
 function togglePack(open){pack.hidden=!open;packBtn.setAttribute('aria-expanded',String(open));if(open){renderInv();var f=pack.querySelector('.islot');(f||pack).focus();}}
 packBtn.addEventListener('click',function(){togglePack(pack.hidden);});
-function renderInv(){var have=[];if(state.inv.key)have.push('key');if(state.inv.churu>0)have.push('churu');if(state.inv.notes)have.push('notes');if(state.inv.letter)have.push('letter');if(state.inv.blueprints)have.push('blueprints');
+function renderInv(){var have=[];if(state.inv.key)have.push('key');if(state.inv.churu>0)have.push('churu');if(state.inv.notes)have.push('notes');if(state.inv.letter)have.push('letter');if(state.inv.blueprints)have.push('blueprints');if(state.inv.mushroom)have.push('mushroom');if(state.inv.plate)have.push('plate');
   var sl=pack.querySelector('.pslots');sl.innerHTML=have.length?have.map(function(id){return '<button class="islot" data-item="'+id+'" aria-pressed="'+(state.sel===id)+'" title="'+INV[id].name+': '+INV[id].desc+'"><img alt="" src="'+icon(id)+'">'+(id==='churu'?'<span class="n">×'+state.inv.churu+'</span>':'')+'<span class="il">'+INV[id].name+'</span></button>';}).join(''):'<p class="empty">Nothing yet. Desks and shelves are worth checking.</p>';
-  sl.querySelectorAll('.islot').forEach(function(b2){b2.addEventListener('click',function(){var id=b2.dataset.item;if(id==='notes'){togglePack(false);readNotes();return;}if(id==='letter'){togglePack(false);openLetter();return;}if(id==='blueprints'){togglePack(false);openLockbox();return;}selectItem(id);togglePack(false);});});
+  sl.querySelectorAll('.islot').forEach(function(b2){b2.addEventListener('click',function(){var id=b2.dataset.item;if(id==='notes'){togglePack(false);readNotes();return;}if(id==='letter'){togglePack(false);openLetter();return;}if(id==='blueprints'){togglePack(false);openLockbox();return;}if(id==='plate'){togglePack(false);openModal('AGAR PLATE','<p>'+INV.plate.desc+' In a few days, clean white mycelium should creep out across the agar.</p>');return;}selectItem(id);togglePack(false);});});
   var ps=document.getElementById('packSel');ps.innerHTML=state.sel?'<img alt="" src="'+icon(state.sel)+'">':'';
   packBtn.setAttribute('aria-label','Backpack, '+have.length+' item'+(have.length===1?'':'s')+(state.sel?', holding '+INV[state.sel].name:''));
   cv.classList.toggle('holding',!!state.sel);}
 function selectItem(id){if(state.sel===id){state.sel=null;say('Laura puts the '+INV[id].name.toLowerCase()+' away.');}
-  else{state.sel=id;say(id==='churu'?'Laura holds out a churu. Click Felix to give it to him.':'Laura holds the brass key. Click what you want to use it on.');}renderInv();}
-function readNotes(){openModal('INOCULATION NOTES','<div class="notebook"><p><b>Oyster:</b> grain spawn into pasteurized straw, about 10% spawn rate. Pins in 2 to 3 weeks.</p><p><b>Lion\'s mane:</b> supplemented hardwood sawdust. Likes it cool and humid.</p><p>Flame the scalpel. Then flame it again.</p><p><b>Jar 14:</b> green mold. Trichoderma. RIP.</p><p><b>Idea:</b> oyster mycelium on contaminated soil (mycoremediation trial).</p>'+readJournalCase()+'</div>');if(state.case.soil)caseStep('journal','The mushroom journal matches site 2\'s staging: the insider knew the strain\'s exact tolerances.');}
+  else{state.sel=id;say(id==='churu'?'Laura holds out a churu. Click Felix to give it to him.':(id==='mushroom'?'Laura carries the oyster mushroom. Take it to the still air box in the lab.':'Laura holds the brass key. Click what you want to use it on.'));}renderInv();}
+function readNotes(){openModal('INOCULATION NOTES','<div class="notebook"><p><b>Oyster:</b> grain spawn into pasteurized straw, about 10% spawn rate. Pins in 2 to 3 weeks.</p><p><b>Lion\'s mane:</b> supplemented hardwood sawdust. Likes it cool and humid.</p><p>Flame the scalpel. Then flame it again.</p><p><b>Jar 14:</b> green mold. Trichoderma. RIP.</p><p><b>Idea:</b> oyster mycelium on contaminated soil (mycoremediation trial).</p>'+readJournalCase()+'</div>');}
 /* notepad: tasks + clues, written as you play */
 var noteBtn=document.getElementById('noteBtn'),noteDot=document.getElementById('noteDot');
 function addNote(t){if(state.notes.indexOf(t)>-1)return;state.notes.push(t);noteDot.hidden=false;}
@@ -1155,7 +1191,8 @@ noteBtn.addEventListener('click',openNotepad);
 function useOn(o){var id=state.sel;
   if(id==='key'&&o.id==='cabinet'){state.sel=null;renderInv();return false;}
   if(id==='churu'&&o.id==='felix'){state.sel=null;renderInv();feedFelix();return true;}
-  say(id==='churu'?'Felix would like that churu. He\'s not over there.':'The key doesn\'t fit anything there.');state.sel=null;renderInv();return true;}
+  if(id==='mushroom'&&o.id==='ksab'){state.sel=null;renderInv();openModal('STILL AIR BOX · TISSUE CLONE','');startClone();return true;}
+  say(id==='churu'?'Felix would like that churu. He\'s not over there.':(id==='mushroom'?'That mushroom belongs in the still air box.':'The key doesn\'t fit anything there.'));state.sel=null;renderInv();return true;}
 var CHURU=[{n:'Felix inhales the churu like it owes him money.',s:'Okay, okay. One churu.'},
            {n:'Felix holds Laura\'s hand still with both paws so the churu can\'t escape.',s:'Who\'s my little gremlin?'},
            {n:'Felix finishes the churu and stares at the empty wrapper, betrayed.',s:'That was the last one. I mean it.'}];
@@ -1238,7 +1275,7 @@ function openDiploma(){
 /* ================= THE CASE OF THE SECOND SPILL ================= */
 var CASE_NAME='The Case of the Second Spill';
 state.case={letter:false,folder:false,telemetry:false,alibi:false,travel:false,whois:false,soil:false,globe:false,lockbox:false,journal:false,sealed:false};
-var CASE_STEPS=[['letter','Read the letter waiting on the desk'],['folder','Open the case folder in the filing cabinet'],['telemetry','Run the phone telemetry on the laptop'],['travel','Find out who really had the opportunity'],['globe','Crack the globe (find the shell company\'s jurisdiction first)'],['lockbox','Retrieve what\'s hidden under the tiger rug'],['soil','Model how the second spill got into the soil'],['journal','Check the mushroom journal against the evidence'],['sealed','Seal the evidence for chain of custody']];
+var CASE_STEPS=[['letter','Read the letter waiting on the desk'],['folder','Open the case folder in the filing cabinet'],['telemetry','Run the phone telemetry on the laptop'],['travel','Find out who really had the opportunity'],['globe','Crack the globe (find the shell company\'s jurisdiction first)'],['lockbox','Retrieve what\'s hidden under the tiger rug'],['soil','Model how the second spill got into the soil'],['journal','Run a grain transfer in the kitchen\'s still air box'],['sealed','Seal the evidence for chain of custody']];
 function caseReady(){var c=state.case;return c.letter&&c.folder&&c.travel&&c.lockbox&&c.soil&&c.journal;}
 function caseProgress(){var n=0;CASE_STEPS.forEach(function(s){if(state.case[s[0]])n++;});return n;}
 function caseStep(k,note){if(state.case[k])return;state.case[k]=true;if(note)addNote(note);}
@@ -1305,12 +1342,422 @@ function sealCase(){caseStep('sealed','Case closed. The evidence package is seal
   burst(551,190,30);say('Case closed. It goes to the CEO and the patent attorneys in the morning.');speak('Case closed. Grain jars are in the incubator. Goodnight, Felix.');document.getElementById('caseName').textContent=CASE_NAME+' · CLOSED';}
 var CASE_SUMMARY='Phone telemetry put two employees near site 2, and both had solid alibis. But Okafor\'s legitimate conference trip to Verdance\'s home city was when the strain data left the building. The second spill was a single staged pulse, primed with Lumen\'s own broth and tuned to the strain\'s exact tolerances, so Verdance could show the stolen strain working in the field and file a fraudulent patent.';
 
+/* shared doorway painter: same casing, lintel, threshold and proportions everywhere */
+function paintDoorway(ctx,x0,x1,wallFn,inside,floorC){
+  for(var x=x0;x<=x1;x++){var w=wallFn(x),span=w.bot-w.top,h=span*.4,yt=w.bot-h,fh=Math.max(4,span*.035);
+    R(inside,x,yt,1,h-fh,ctx);R(floorC,x,w.bot-fh,1,fh,ctx);
+    R('#3a2414',x,yt-3,1,3,ctx);R('#7a5233',x,yt-3,1,1,ctx);R('#2a180c',x,w.bot-1,1,1,ctx);
+    if(x<=x0+1||x>=x1-1){R('#3a2414',x,yt-3,1,h+3,ctx);if(x===x0+1||x===x1-1)R('#7a5233',x,yt,1,h,ctx);}}}
+function rightWallAt(x){return {top:30*(640-x)/80,bot:135+225*(x-560)/80};}
+function leftWallAt(x){return {top:30*x/80,bot:360-225*x/80};}
+function dividerAt(x){return {top:30-30*(x-398)/32,bot:135+225*(x-398)/32};}
+function dwxAt(y){return 398+(y-135)*32/225;}
+function paintCabinDoorway(){paintDoorway(b,604,623,rightWallAt,'#8a5e3a','#a0603e');}
+var wallL=document.createElement('canvas');wallL.width=W;wallL.height=H;
+function paintDivider(){var wc=wallL.getContext('2d');wc.clearRect(0,0,W,H);
+  for(var x=398;x<=430;x++){var w=dividerAt(x),span=w.bot-w.top,isDoor=(w.bot>262&&w.bot<310),cut=isDoor?w.bot-span*.4:w.bot;
+    for(var i=0;i<7;i++){var a=w.top+span*i/7,z=Math.min(cut,w.top+span*(i+1)/7),hh=z-a;if(hh<=0)continue;R(shadeHex(LOG[i%4],.82),x,a,1,hh+1,wc);R(shadeHex('#7a5233',.82),x,a+1,1,Math.max(1,(span/7)*.13),wc);if(w.top+span*(i+1)/7<=cut){R(shadeHex('#3a2414',.82),x,z-span/7*.2,1,span/7*.2,wc);R(shadeHex('#b9a98a',.7),x,z-1,1,1,wc);}}}
+  // casing and lintel drawn on the wall layer, the opening itself left clear
+  var d0=415,d1=424;for(var x2=d0;x2<=d1;x2++){var w2=dividerAt(x2),sp=w2.bot-w2.top,yt=w2.bot-sp*.4;R('#3a2414',x2,yt-3,1,3,wc);R('#7a5233',x2,yt-3,1,1,wc);if(x2<=d0+1||x2>=d1-1){R('#3a2414',x2,yt-3,1,sp*.4+3,wc);if(x2===d0+1||x2===d1-1)R('#7a5233',x2,yt,1,sp*.4,wc);}}}
+function paintDividerBG(){paintDoorway(b,415,424,dividerAt,'#cdd2d6','#bcc0c4');}
+
+/* barrel rug, stools, cat tree, posters, petri shelf */
+function paintKitchenExtras(){
+  paintKitchenFill();
+  // round braided rug under the barrel table
+  var rc=['#7a5a3a','#b89a6a','#5a3a2a','#c8b08a','#8a4a2a','#d8c8a8','#6a5a4a'];for(var ri=0;ri<rc.length;ri++)ell(rc[ri],300,258,74-ri*10,26-ri*3.6,b);
+  for(var a=0;a<120;a++){var ang=a/120*6.283,rr=1-(a%7)*.12;R('rgba(40,24,12,.25)',300+Math.cos(ang)*72*rr,258+Math.sin(ang)*25*rr,2,1,b);}
+  // mycology posters on the lab's right wall
+  POSTERS.forEach(function(pp){for(var x=pp.x0;x<=pp.x1;x++){var w=rightWallAt(x),span=w.bot-w.top,y0=w.top+span*.24,y1=w.top+span*.5,h=y1-y0;
+    R('#efe8d8',x,y0,1,h,b);R(pp.c,x,y0,1,h*.16,b);for(var ly=y0+h*.24;ly<y1-3;ly+=4)if((x+Math.floor(ly))%5)R('#9a9488',x,ly,1,1,b);
+    if(x>pp.x0+2&&x<pp.x1-2&&(x-pp.x0)%3===0)R(pp.c,x,y0+h*.55,1,h*.18,b);
+    if(x===pp.x0||x===pp.x1)R('#5a5450',x,y0,1,h,b);R('#c9c0ac',x,y1,1,1,b);}
+    var cx=Math.round((pp.x0+pp.x1)/2),cw=rightWallAt(cx),cs=cw.bot-cw.top,my=cw.top+cs*.33,mw=Math.max(2,Math.round((pp.x1-pp.x0)*.3));ell('#d8cfb8',cx,Math.round(my+2),mw+2,Math.round(cs*.05),b);ell(pp.c,cx,Math.round(my),mw,Math.max(2,Math.round(cs*.025)),b);R('#e8dcc0',cx,Math.round(my),1,Math.round(cs*.05),b);});
+  // petri-dish shelf on the lab's back wall
+  for(var sh=0;sh<2;sh++){var sy=100+sh*16;R('#8a8e94',444,sy,86,3,b);R('#b8bcc0',444,sy,86,1,b);R('#6a6e74',448,sy+3,2,4,b);R('#6a6e74',524,sy+3,2,4,b);
+    for(var st=0;st<7;st++){var px=448+st*11;for(var d=0;d<3;d++){var dy=sy-3-d*3,agar=((st+d+sh)%5===3)?'#7aaa5a':'#d8c070';R('rgba(220,235,240,.65)',px,dy,9,3,b);R(agar,px+1,dy+1,7,1,b);if((st*3+d+sh)%4!==3)R('#f4f0e4',px+3,dy+1,3,1,b);}}}
+}
+var POSTERS=[{id:'pSplice',x0:563,x1:573,c:'#3a6aa8',t:'TISSUE CLONING & AGAR TRANSFERS'},{id:'pInoc',x0:579,x1:591,c:'#b0331f',t:'INOCULATING GRAIN'},{id:'pBags',x0:597,x1:611,c:'#2f7a4a',t:'PRESSURE-COOKING UNICORN BAGS'},{id:'pSpecies',x0:616,x1:633,c:'#8a5a24',t:'SPECIES AT A GLANCE'}];
+var POSTER_TXT={
+ pSplice:'<ol class="steps"><li>Work in the still air box. Wipe everything with 70% isopropyl.</li><li>Flame the scalpel until it glows red, then let it cool for a few seconds.</li><li>Tear a clean mushroom open by hand; don\'t cut through the outside.</li><li>Take a small piece of tissue from the inside of the stem and lay it on fresh agar.</li><li>After a few days, cut a wedge from the cleanest, whitest leading edge and move it to a new plate.</li><li>Repeat until the plate shows only clean mycelium. Bin anything green, black or slimy.</li></ol>',
+ pInoc:'<ol class="steps"><li>Start with sterilized, fully cooled grain.</li><li>Wipe down the box, gloves, jars and tools.</li><li>Flame the scalpel or needle between every transfer.</li><li>Open the jar only as long as you need: a quick wedge of clean agar, or a few cc of liquid culture through the injection port.</li><li>Seal, label with date and strain, and incubate somewhere dark and stable.</li><li>Shake once the grain is about a third colonized to speed things up.</li></ol>',
+ pBags:'<ol class="steps"><li>Hydrate grain (or mix supplemented hardwood sawdust) to field capacity: damp, not dripping.</li><li>Fill the filter-patch bag, leaving headspace. Fold the top down so the patch is protected.</li><li>Load on the cooker rack so bags don\'t touch the bottom. Add water to the line.</li><li>Grain: about 90 minutes at 15 PSI. Supplemented sawdust: about 2.5 hours at 15 PSI.</li><li>Let it cool and depressurize on its own. Never force the lid.</li><li>Inoculate in the still air box, then impulse-seal the bag above the patch.</li></ol>',
+ pSpecies:'<ul class="steps"><li><b>Oyster</b> (<i>Pleurotus ostreatus</i>): straw or hardwood; fast and forgiving.</li><li><b>Blue oyster</b>: same care, likes it cooler.</li><li><b>Pink oyster</b> (<i>P. djamor</i>): loves heat; eat it fresh.</li><li><b>Lion\'s mane</b> (<i>Hericium erinaceus</i>): supplemented hardwood; cool and humid.</li><li><b>Shiitake</b> (<i>Lentinula edodes</i>): hardwood logs or sawdust blocks; patient.</li><li><b>Reishi</b> (<i>Ganoderma</i>): hardwood; grows antlers in high CO₂.</li></ul>'};
+function drawStool(x,y){R('#141416',x-5,y-12,1,12);R('#141416',x+5,y-12,1,12);R('#141416',x-3,y-11,1,9);R('#141416',x+3,y-11,1,9);R('#2a2a2e',x-5,y-5,11,1);
+  ell('#1a1a1e',x,y-13,7,2);R('#3a3a40',x-5,y-15,10,1);R('#0e0e10',x-6,y-12,13,1);}
+function drawCatTree(){
+  R('#2a2420',50,232,36,6);R('#8a8478',50,228,36,5);R('#a8a294',50,228,36,1);
+  for(var py=146;py<229;py++){R((py%3)?'#c4a878':'#9a8058',58,py,4,1);R((py%3)?'#c4a878':'#9a8058',76,py+20>228?228:py+20,4,1);}
+  R('#8a8478',50,200,24,22);R('#a8a294',50,200,24,1);ell('#2a2420',62,212,5,5);
+  R('#8a8478',66,176,20,5);R('#a8a294',66,176,20,1);R('#6a6458',66,180,20,1);
+  R('#8a8478',50,140,26,6);R('#a8a294',50,140,26,1);R('#8a8478',50,136,2,4);R('#8a8478',74,136,2,4);
+  R('#c9c0ac',84,181,1,10);ell('#d0402c',84,193,2,2);
+}
+/* ---- filling out the kitchen ---- */
+function paintKitchenFill(){
+  // striped runner rug in front of the sink and stove
+  for(var y=158;y<178;y++){var t=(y-158)/20,l=118-t*4,r=334+t*4;for(var x=l;x<r;x++){var edge=y<160||y>175||x<l+2||x>r-3,band=Math.floor((x-l)/9)%4;R(edge?'#3a2a20':['#8a3a2a','#d8c8a8','#3a4a5a','#c9a24a'][band],x,y,1,1,b);}if((y%2)===0){R('#e8dcc0',l-2,y,2,1,b);R('#e8dcc0',r,y,2,1,b);}}
+  // chalkboard grocery list on the left wall
+  for(var x2=40;x2<=70;x2++){var w=leftWallAt(x2),span=w.bot-w.top,y0=w.top+span*.2,y1=w.top+span*.42,h=y1-y0;
+    R((x2===40||x2===70)?'#6b4527':'#26302a',x2,y0,1,h,b);R('#6b4527',x2,y0,1,2,b);R('#6b4527',x2,y1-2,1,2,b);
+    for(var ly=y0+5;ly<y1-4;ly+=5)if(x2>42&&x2<(60+((ly*7)%9))&&(x2+Math.floor(ly))%4)R('#c8ccc0',x2,ly,1,1,b);}
+  // drying garland of shiitake slices and lavender across the beam
+  for(var gx=186;gx<=276;gx++){var gy=Math.round(16+Math.sin((gx-186)/90*Math.PI)*10);R('#8a7a5a',gx,gy,1,1,b);
+    if((gx-186)%9===4){R('#a8805a',gx-2,gy+2,5,3,b);R('#6b4a2a',gx-1,gy+3,3,1,b);}if((gx-186)%9===0){R('#7a6aa8',gx,gy+1,1,6,b);R('#9a8ac8',gx-1,gy+2,1,3,b);R('#5a7a4a',gx,gy+7,1,2,b);}}
+}
+function drawCounterStuff(){
+  // magnetic knife strip
+  R('#2a2b30',214,80,34,2);[217,223,229,235,241].forEach(function(x,i){R('#c8ccd0',x,82,2,10-(i%2)*3);R('#3a2414',x,79,2,3);});
+  // utensil crock
+  R('#e8dcc8',116,98,10,10);R('#c8bca8',116,98,10,1);R('#6b4527',118,90,1,8);R('#9a9ea4',121,88,1,10);R('#6b4527',123,91,1,7);ell('#6b4527',118,90,1,1);
+  // cutting board leaning on the backsplash
+  R('#a87a4a',190,90,14,18);R('#c89a5a',190,90,14,1);ell('#1c110a',197,93,1,1);
+  // gooseneck kettle and coffee grinder
+  R('#2a2b30',246,98,10,10);R('#3a3b40',246,98,10,2);line('#2a2b30',256,100,262,94);R('#c9a867',249,96,4,2);
+  R('#6b4527',236,100,7,8);R('#9a9ea4',237,96,5,4);R('#2a2b30',239,94,1,2);
+  // lemons in a bowl
+  ell('#e8e2d6',266,106,7,2);ell('#e8c840',263,104,3,2);ell('#f0d050',268,103,3,2);ell('#d8b830',266,101,3,2);
+  // paper towels
+  R('#f4f0e8',334,96,6,12);R('#9a9ea4',336,94,2,2);
+}
+function drawClock(){var d=new Date(),cx=236,cy=50;ell('#3a2414',cx,cy,9,9);ell('#efe6cf',cx,cy,7,7);
+  for(var i=0;i<12;i++){var a=i/12*6.283;R('#3a2414',cx+Math.round(Math.sin(a)*6),cy-Math.round(Math.cos(a)*6),1,1);}
+  var hA=((d.getHours()%12)+d.getMinutes()/60)/12*6.283,mA=d.getMinutes()/60*6.283;line('#1c110a',cx,cy,cx+Math.round(Math.sin(hA)*3.5),cy-Math.round(Math.cos(hA)*3.5));line('#1c110a',cx,cy,cx+Math.round(Math.sin(mA)*5.5),cy-Math.round(Math.cos(mA)*5.5));R('#b0331f',cx,cy,1,1);}
+function drawCart(){var x0=168,by=336;ell('rgba(0,0,0,.4)',198,by+1,32,3);
+  R('#3a3b40',x0+2,by-30,2,28);R('#3a3b40',x0+56,by-30,2,28);R('#a87a4a',x0,by-34,60,5);R('#c89a5a',x0,by-34,60,1);R('#6b4527',x0+2,by-18,56,3);R('#6b4527',x0+2,by-6,56,3);
+  ell('#1c1c1e',x0+4,by,2,2);ell('#1c1c1e',x0+56,by,2,2);
+  [[x0+8,by-24],[x0+18,by-24],[x0+28,by-25],[x0+40,by-24]].forEach(function(j,i){R('rgba(220,235,240,.55)',j[0],j[1],7,6);R(['#c9a24a','#8a6a3a','#e8dcc0','#b0331f'][i],j[0]+1,j[1]+2,5,4);R('#c9a867',j[0],j[1]-1,7,1);});
+  R('#d8d0c0',x0+8,by-12,20,6);R('#a8a090',x0+34,by-12,18,6);
+  for(var t=0;t<4;t++){R(t%2?'#e8e0cc':'#d8d0bc',x0+14,by-58+t*6,32,6);R('#b8b0a0',x0+14,by-53+t*6,32,1);}
+  R('#efe8d8',x0+12,by-62,36,4);R('#3a3b40',x0+28,by-61,4,2);R('#4f9a5a',x0+46,by-56,1,1);
+  for(var s=0;s<6;s++)R('#a8805a',x0+17+s*5,by-56+((s*2)%3)*6,3,2);}
+function drawBins(){R('#3a3b40',64,170,14,18);R('#5a5b60',63,169,16,2);R('#7a7e84',69,166,4,2);R('#2f5a3a',82,176,11,12);R('#4f7a5a',81,175,13,2);R('#c8b890',84,173,7,2);}
+function drawBoots(){R('#4a3a2a',30,334,46,10);R('#5a4a38',30,334,46,1);
+  [[36,327],[50,328]].forEach(function(bt){R('#3a2414',bt[0],bt[1],6,10);R('#3a2414',bt[0],bt[1]+7,10,4);R('#6b4a2a',bt[0]+1,bt[1]+1,4,1);R('#7a6a4a',bt[0],bt[1]+10,10,1);R('#8a7a5a',bt[0]+2,bt[1]+3,2,1);});
+  R('#c9b48e',64,326,10,12);R('#9a8460',64,326,10,1);for(var m=0;m<5;m++)R('#7a6a4a',65+(m*2)%9,329+m*2,1,1);R('#a8805a',66,329,3,2);}
+/* ================= poster artwork (shown full size when clicked) ================= */
+var IC={
+ spray:'<g><rect x="-9" y="-6" width="18" height="26" rx="4" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="-6" y="-14" width="10" height="8" fill="#3a6aa8" stroke="#1c110a" stroke-width="2"/><path d="M4 -12 h10" stroke="#1c110a" stroke-width="2"/><text x="0" y="12" font-size="7" text-anchor="middle" font-family="Arial" font-weight="700">70%</text><path d="M16 -14 l6 -4 M16 -12 l7 0 M16 -10 l6 4" stroke="#3a6aa8" stroke-width="1.5"/></g>',
+ flame:'<g><path d="M-18 8 L14 -4" stroke="#8a8e94" stroke-width="4" stroke-linecap="round"/><path d="M14 -4 L22 -7" stroke="#d0402c" stroke-width="3" stroke-linecap="round"/><path d="M20 10 C12 2 18 -6 22 -14 C26 -6 32 2 24 10 Z" fill="#f2a33a" stroke="#1c110a" stroke-width="1.5"/><path d="M22 8 C19 4 21 0 23 -4 C25 0 26 4 22 8Z" fill="#ffe08a"/></g>',
+ tear:'<g><path d="M-18 -4 C-14 -18 14 -18 18 -4 Z" fill="#c8bca0" stroke="#1c110a" stroke-width="2"/><path d="M-4 -4 L-6 16 L6 16 L4 -4" fill="#efe6cf" stroke="#1c110a" stroke-width="2"/><path d="M0 -14 L-2 -2 L2 6 L-1 16" stroke="#b0331f" stroke-width="2" fill="none" stroke-dasharray="3 2"/><circle cx="0" cy="6" r="3" fill="#ffffff" stroke="#3a6aa8" stroke-width="1.5"/></g>',
+ plate:'<g><ellipse cx="0" cy="4" rx="22" ry="9" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><ellipse cx="0" cy="3" rx="18" ry="6.5" fill="#e8d070"/><ellipse cx="2" cy="3" rx="5" ry="2.5" fill="#ffffff"/><path d="M2 3 l-6 -2 M2 3 l7 -1 M2 3 l-3 3 M2 3 l5 2" stroke="#ffffff" stroke-width="1.2"/></g>',
+ wedge:'<g><ellipse cx="-10" cy="6" rx="14" ry="6" fill="#e8d070" stroke="#1c110a" stroke-width="1.5"/><path d="M-14 4 h6 v4 h-6z" fill="#ffffff" stroke="#1c110a" stroke-width="1"/><path d="M-4 0 L16 -14" stroke="#8a8e94" stroke-width="3" stroke-linecap="round"/><rect x="10" y="-16" width="7" height="5" fill="#ffffff" stroke="#1c110a" stroke-width="1"/></g>',
+ jar:'<g><rect x="-12" y="-12" width="24" height="28" rx="3" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="-13" y="-17" width="26" height="6" fill="#c9a867" stroke="#1c110a" stroke-width="2"/><rect x="-10" y="-4" width="20" height="18" fill="#c9a24a"/><path d="M-10 0 h20 M-10 5 h20 M-10 10 h20" stroke="#ffffff" stroke-width="2" stroke-dasharray="2 3"/></g>',
+ syringe:'<g><rect x="-18" y="-4" width="26" height="8" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="-16" y="-2" width="14" height="4" fill="#c8a8d8"/><path d="M8 0 h12" stroke="#1c110a" stroke-width="1.5"/><path d="M-18 -7 v14 M-24 0 h6" stroke="#1c110a" stroke-width="2"/></g>',
+ shake:'<g><rect x="-10" y="-12" width="20" height="24" rx="3" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="-8" y="-2" width="16" height="12" fill="#f4f0e4"/><path d="M-20 -8 q-6 8 0 16 M20 -8 q6 8 0 16" stroke="#3a6aa8" stroke-width="2" fill="none"/></g>',
+ grain:'<g><path d="M-16 -10 h32 l-4 24 h-24 z" fill="#c9a24a" stroke="#1c110a" stroke-width="2"/><path d="M-12 0 l4 -3 M-4 2 l4 -3 M4 0 l4 -3 M-8 8 l4 -3 M2 8 l4 -3" stroke="#8a6a2a" stroke-width="2"/><path d="M-6 -16 q6 -6 12 0" stroke="#3a6aa8" stroke-width="2" fill="none"/></g>',
+ bag:'<g><path d="M-14 -16 h28 v32 h-28 z" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="-6" y="-12" width="12" height="8" fill="#ffffff" stroke="#8a8e94" stroke-width="1.5"/><rect x="-12" y="2" width="24" height="12" fill="#c9a24a"/></g>',
+ cooker:'<g><rect x="-18" y="-8" width="36" height="24" rx="3" fill="#9a9ea4" stroke="#1c110a" stroke-width="2"/><rect x="-20" y="-12" width="40" height="6" fill="#6a6e74" stroke="#1c110a" stroke-width="2"/><circle cx="8" cy="-16" r="5" fill="#ffffff" stroke="#1c110a" stroke-width="1.5"/><path d="M8 -16 l3 -2" stroke="#b0331f" stroke-width="1.5"/><text x="0" y="8" font-size="8" text-anchor="middle" font-family="Arial" font-weight="700" fill="#1c110a">15 PSI</text></g>',
+ cool:'<g><rect x="-4" y="-16" width="8" height="26" rx="4" fill="#ffffff" stroke="#1c110a" stroke-width="2"/><circle cx="0" cy="12" r="7" fill="#3a6aa8" stroke="#1c110a" stroke-width="2"/><rect x="-1.5" y="-4" width="3" height="14" fill="#3a6aa8"/></g>',
+ seal:'<g><path d="M-14 -16 h28 v32 h-28 z" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><path d="M-16 -6 h32" stroke="#b0331f" stroke-width="3"/><rect x="-12" y="2" width="24" height="12" fill="#f4f0e4"/></g>'};
+function mush(kind){switch(kind){
+ case 'oyster':return '<g><path d="M-22 0 C-22 -18 0 -22 10 -8 C2 -4 -8 2 -22 0Z" fill="#c8c0a8" stroke="#1c110a" stroke-width="2"/><path d="M-6 6 C-6 -10 12 -14 20 -2 C12 2 4 8 -6 6Z" fill="#d8d0b8" stroke="#1c110a" stroke-width="2"/><path d="M-2 10 v10" stroke="#1c110a" stroke-width="3"/></g>';
+ case 'blue':return '<g><path d="M-20 2 C-20 -16 2 -20 12 -6 C4 -2 -6 4 -20 2Z" fill="#6a7a98" stroke="#1c110a" stroke-width="2"/><path d="M-4 8 C-4 -8 14 -12 20 0 C12 4 6 10 -4 8Z" fill="#8a9ab8" stroke="#1c110a" stroke-width="2"/></g>';
+ case 'pink':return '<g><path d="M-20 2 C-20 -16 2 -20 12 -6 C4 -2 -6 4 -20 2Z" fill="#e88aa8" stroke="#1c110a" stroke-width="2"/><path d="M-4 8 C-4 -8 14 -12 20 0 C12 4 6 10 -4 8Z" fill="#f4a8c0" stroke="#1c110a" stroke-width="2"/></g>';
+ case 'lion':return '<g><ellipse cx="0" cy="0" rx="18" ry="15" fill="#f4f0e4" stroke="#1c110a" stroke-width="2"/>'+[-12,-6,0,6,12].map(function(x){return '<path d="M'+x+' 4 v12" stroke="#c8c0a8" stroke-width="2"/>';}).join('')+'</g>';
+ case 'shiitake':return '<g><path d="M-20 0 C-20 -18 20 -18 20 0 Z" fill="#7a4a2a" stroke="#1c110a" stroke-width="2"/><path d="M-12 -6 l3 -2 M2 -10 l3 1 M8 -4 l3 -2" stroke="#d8c8a8" stroke-width="2"/><rect x="-4" y="0" width="8" height="16" fill="#e8dcc0" stroke="#1c110a" stroke-width="2"/></g>';
+ case 'reishi':return '<g><path d="M-22 4 C-20 -14 18 -16 22 2 C10 8 -10 10 -22 4Z" fill="#a8301e" stroke="#1c110a" stroke-width="2"/><path d="M-16 0 C-6 -6 8 -6 16 0" stroke="#e8b85a" stroke-width="2" fill="none"/><path d="M14 2 C18 6 22 6 24 4" stroke="#f4e0b0" stroke-width="3"/></g>';}}
+var POSTER_ART={
+ pSplice:{title:'TISSUE CLONING',sub:'from fresh mushroom to clean agar',col:'#3a6aa8',steps:[['spray','Wipe the box, gloves and tools with 70% alcohol'],['flame','Flame the scalpel red-hot, then let it cool'],['tear','Tear the mushroom open by hand. Cut from the clean inside of the stem'],['plate','Lay the tissue on fresh agar and close the lid fast'],['wedge','Move the cleanest leading edge to a new plate until it\'s pure']]},
+ pInoc:{title:'INOCULATING GRAIN',sub:'agar or liquid culture into sterile jars',col:'#b0331f',steps:[['jar','Start with sterilized, fully cooled grain'],['spray','Wipe down the box, the jars and yourself'],['flame','Flame the tool between every transfer'],['syringe','A wedge of clean agar, or a few cc of liquid culture through the port'],['shake','Label, incubate in the dark, shake at about one-third colonized']]},
+ pBags:{title:'PRESSURE-COOKING UNICORN BAGS',sub:'filter-patch bags, the right way',col:'#2f7a4a',steps:[['grain','Hydrate grain or mix sawdust: damp, never dripping'],['bag','Fill the bag, fold the top over the filter patch'],['cooker','Grain about 90 min, sawdust about 2.5 h, at 15 PSI'],['cool','Let it cool down on its own. Never force the lid'],['seal','Inoculate in the box, then impulse-seal above the patch']]},
+ pSpecies:{title:'SPECIES AT A GLANCE',sub:'what grows well in this cabin',col:'#8a5a24',species:[['oyster','Oyster','Pleurotus ostreatus','straw or hardwood'],['blue','Blue oyster','P. ostreatus var.','likes it cool'],['pink','Pink oyster','P. djamor','loves heat'],['lion','Lion\'s mane','Hericium erinaceus','cool and humid'],['shiitake','Shiitake','Lentinula edodes','hardwood blocks'],['reishi','Reishi','Ganoderma','antlers in high CO₂']]}};
+function posterSVG(id){var p=POSTER_ART[id],h='<svg class="poster" viewBox="0 0 400 540" role="img" aria-label="'+p.title+' poster"><rect x="4" y="4" width="392" height="532" fill="#f4ecd8" stroke="#1c110a" stroke-width="4"/>'+
+  '<rect x="4" y="4" width="392" height="86" fill="'+p.col+'"/><text x="200" y="48" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="'+(p.title.length>20?19:26)+'" fill="#f4ecd8">'+p.title+'</text><text x="200" y="74" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="15" fill="#f4ecd8">'+p.sub+'</text>';
+  if(p.steps)p.steps.forEach(function(st,i){var y=112+i*84;h+='<rect x="20" y="'+(y-4)+'" width="360" height="74" fill="#ffffff" stroke="#c8bca0" stroke-width="1.5"/><circle cx="44" cy="'+(y+33)+'" r="15" fill="'+p.col+'"/><text x="44" y="'+(y+39)+'" text-anchor="middle" font-family="Arial Black, Arial" font-size="16" fill="#fff">'+(i+1)+'</text><g transform="translate(104 '+(y+33)+') scale(1.35)">'+IC[st[0]]+'</g>'+wrapText(st[1],148,y+24,30,'Georgia, serif',15)+'</g>';});
+  else p.species.forEach(function(sp,i){var cx=110+(i%2)*180,cy=150+Math.floor(i/2)*128;h+='<rect x="'+(cx-86)+'" y="'+(cy-40)+'" width="172" height="118" fill="#ffffff" stroke="#c8bca0" stroke-width="1.5"/><g transform="translate('+cx+' '+(cy+4)+') scale(1.6)">'+mush(sp[0])+'</g><text x="'+cx+'" y="'+(cy+48)+'" text-anchor="middle" font-family="Arial Black, Arial" font-size="14">'+sp[1]+'</text><text x="'+cx+'" y="'+(cy+63)+'" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="12">'+sp[2]+'</text><text x="'+cx+'" y="'+(cy+76)+'" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#5a4a38">'+sp[3]+'</text>';});
+  return h+'<text x="200" y="526" text-anchor="middle" font-family="Arial" font-size="10" fill="#8a7a5a" letter-spacing="2">CABIN MYCOLOGY LAB</text></svg>';}
+function wrapText(t,x,y,max,font,size){var words=t.split(' '),lines=[''],out='';words.forEach(function(w){if((lines[lines.length-1]+' '+w).trim().length>max)lines.push(w);else lines[lines.length-1]=(lines[lines.length-1]+' '+w).trim();});
+  lines.forEach(function(l,i){out+='<text x="'+x+'" y="'+(y+i*18)+'" font-family="'+font+'" font-size="'+size+'" fill="#1c110a">'+l.replace(/&/g,'&amp;')+'</text>';});return '<g>'+out;}
+/* ================= still air box: clone a mushroom onto agar ================= */
+var tc=null;
+function sabMenu(){var hasM=!!state.inv.mushroom;
+  openModal('STILL AIR BOX','<p>A clear tote with two arm holes: the poor grower\'s clean room.</p><div class="acts"><button class="pbtn" id="doClone"'+(hasM?'':' disabled')+'>CLONE A MUSHROOM ONTO AGAR</button><button class="pbtn" id="doGrain">GRAIN TRANSFER</button></div>'+(hasM?'':'<p class="dim2">To clone, bring a fresh mushroom. The foraging basket by the cabin\'s front door has some.</p>')+(state.k.jars?'':'<p class="dim2">Grain transfers need sterilized jars from the pressure cooker on the stove.</p>'));
+  document.getElementById('doClone').addEventListener('click',startClone);
+  document.getElementById('doGrain').addEventListener('click',function(){if(!state.k.jars){say('The jars need sterilizing first. The pressure cooker is on the stove.');return;}sab={step:0,flames:0,wedges:0,end:0};renderSAB();});}
+function startClone(){tc={wiped:false,flamed:false,hotUntil:0,torn:false,onBlade:false,lid:false,lidAt:0,openMs:0,placed:false,done:false};renderClone('Wipe everything down first. Then flame the scalpel, tear the mushroom open, and get clean tissue from the inside onto the agar.');}
+function cloneSVG(){var s=tc,now=Date.now(),hot=s.flamed&&now<s.hotUntil;
+  return '<svg class="tcscene" viewBox="0 0 600 330" role="group" aria-label="Inside the still air box">'+
+  '<rect x="10" y="10" width="580" height="310" rx="10" fill="#dbe9f1" stroke="#7a9ab0" stroke-width="4"/><ellipse cx="170" cy="22" rx="70" ry="10" fill="#9ab8c8"/><ellipse cx="430" cy="22" rx="70" ry="10" fill="#9ab8c8"/>'+
+  '<rect x="10" y="250" width="580" height="70" fill="#c8dce6"/>'+
+  // spray bottle
+  '<g class="tco" data-a="spray" tabindex="0" role="button" aria-label="Spray bottle of 70% alcohol"><rect x="36" y="150" width="70" height="150" fill="transparent"/><g transform="translate(70 200) scale(2.2)">'+IC.spray+'</g>'+(s.wiped?'<text x="70" y="290" text-anchor="middle" class="tcl">wiped ✓</text>':'<text x="70" y="290" text-anchor="middle" class="tcl">alcohol</text>')+'</g>'+
+  // lamp
+  '<g class="tco" data-a="lamp" tabindex="0" role="button" aria-label="Alcohol lamp"><rect x="125" y="165" width="60" height="135" fill="transparent"/><rect x="135" y="220" width="40" height="34" rx="6" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><rect x="151" y="208" width="8" height="12" fill="#c9a867" stroke="#1c110a" stroke-width="2"/><path d="M155 206 C147 192 153 182 155 172 C159 182 165 192 155 206Z" fill="#f2a33a" stroke="#1c110a" stroke-width="1.5"/><text x="155" y="290" text-anchor="middle" class="tcl">flame</text></g>'+
+  // scalpel
+  '<g aria-hidden="true"><path d="M200 262 L292 238" stroke="#8a8e94" stroke-width="7" stroke-linecap="round"/><path d="M292 238 L314 230" stroke="'+(hot?'#e0402a':'#c8ccd0')+'" stroke-width="5" stroke-linecap="round"/>'+(s.onBlade?'<rect x="306" y="222" width="10" height="7" fill="#ffffff" stroke="#1c110a"/>':'')+(hot?'<text x="260" y="226" text-anchor="middle" class="tcl" fill="#b0331f">too hot</text>':'')+'</g>'+
+  // mushroom
+  '<g class="tco" data-a="mush" tabindex="0" role="button" aria-label="'+(s.torn?'Torn mushroom, clean inner stem tissue':'Fresh oyster mushroom')+'"><rect x="320" y="96" width="112" height="204" fill="transparent"/>'+(s.torn?
+     '<path d="M330 150 C330 110 368 104 376 138 L372 196 L352 196 Z" fill="#c8c0a8" stroke="#1c110a" stroke-width="2"/><path d="M420 150 C420 110 384 104 378 138 L380 196 L398 196 Z" fill="#c8c0a8" stroke="#1c110a" stroke-width="2"/><path d="M362 140 L364 196 M392 140 L390 196" stroke="#f4f0e4" stroke-width="10"/><circle cx="377" cy="170" r="7" fill="none" stroke="#3a6aa8" stroke-width="2" stroke-dasharray="3 2"/>'
+    :'<g transform="translate(376 160) scale(2.4)">'+mush('oyster')+'</g>')+'<text x="376" y="290" text-anchor="middle" class="tcl">'+(s.torn?'cut inside':'mushroom')+'</text></g>'+
+  // petri dish
+  '<g class="tco" data-a="agar" tabindex="0" role="button" aria-label="Agar in the petri dish"><rect x="450" y="200" width="104" height="44" fill="transparent"/><ellipse cx="500" cy="222" rx="54" ry="20" fill="#e8f0f4" stroke="#1c110a" stroke-width="2"/><ellipse cx="500" cy="220" rx="46" ry="15" fill="#e8d070"/>'+(s.placed?'<rect x="494" y="214" width="12" height="8" fill="#ffffff" stroke="#1c110a"/>':'')+'</g>'+
+  '<g class="tco" data-a="lid" tabindex="0" role="button" aria-label="'+(s.lid?'Close the petri dish lid':'Open the petri dish lid')+'">'+(s.lid?'<ellipse cx="540" cy="160" rx="44" ry="14" fill="rgba(220,235,240,.8)" stroke="#1c110a" stroke-width="2"/>':'<ellipse cx="500" cy="212" rx="56" ry="20" fill="rgba(220,235,240,.65)" stroke="#1c110a" stroke-width="2"/>')+'<text x="'+(s.lid?540:500)+'" y="'+(s.lid?140:290)+'" text-anchor="middle" class="tcl">'+(s.lid?'lid (open!)':'lid')+'</text></g>'+
+  '<g class="tco" data-a="film" tabindex="0" role="button" aria-label="Parafilm to seal the plate"><rect x="414" y="240" width="46" height="50" fill="transparent"/><rect x="420" y="246" width="34" height="18" rx="4" fill="#f4f0e4" stroke="#1c110a" stroke-width="2"/><text x="437" y="282" text-anchor="middle" class="tcl">parafilm</text></g>'+
+  '</svg>';}
+function renderClone(msg){var open=tc.lid?' <b class="warn">Lid open: work fast.</b>':'';
+  mB.innerHTML='<p class="tcmsg">'+msg+open+'</p>'+cloneSVG()+'<div class="acts"><button class="pbtn" id="tcAgain">START OVER</button></div>';
+  mB.querySelectorAll('.tco').forEach(function(g2){g2.addEventListener('click',function(){tcAct(g2.dataset.a);});g2.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tcAct(g2.dataset.a);}});});
+  document.getElementById('tcAgain').addEventListener('click',startClone);}
+function tcFail(why){tc.done=true;mB.innerHTML='<p>'+why+'</p><div class="acts"><button class="pbtn" id="tcAgain">TRY AGAIN</button></div>';document.getElementById('tcAgain').addEventListener('click',startClone);say('Contaminated. Start over.');}
+function tcAct(a){var s=tc,now=Date.now();if(s.done)return;
+  if(a!=='spray'&&!s.wiped){renderClone('Wipe everything down with alcohol before you touch anything.');return;}
+  switch(a){
+  case 'spray':s.wiped=true;renderClone('Box, gloves and tools wiped down. Now flame the scalpel.');return;
+  case 'lamp':s.flamed=true;s.hotUntil=now+2200;renderClone('The blade glows red. Give it a couple of seconds to cool before it touches tissue.');setTimeout(function(){if(tc===s&&!s.done)renderClone(s.torn?'Blade\'s cool. Cut a piece from the clean inside of the stem.':'Blade\'s cool. Now tear the mushroom open by hand.');},2300);return;
+  case 'mush':
+    if(!s.torn){s.torn=true;renderClone('Torn open along the stem. The inside is clean; the outside never touches the blade.'+(s.flamed?'':' Flame the scalpel next.'));return;}
+    if(!s.flamed){tcFail('You cut with an unflamed blade and dragged whatever was on it into the tissue. Green fuzz in three days.');return;}
+    if(now<s.hotUntil){s.flamed=false;renderClone('Too hot: you cooked that piece. Flame the scalpel again and wait a beat.');return;}
+    if(s.onBlade){renderClone('You already have tissue on the blade. Open the lid and set it on the agar.');return;}
+    s.onBlade=true;renderClone('A clean sliver of inner tissue on the blade. Lift the lid and set it on the agar.');return;
+  case 'lid':
+    if(!s.lid){s.lid=true;s.lidAt=now;renderClone(s.onBlade?'Lid up. Drop the tissue on the agar.':'Lid up. Every second it\'s open, spores are drifting in.');return;}
+    s.lid=false;s.openMs+=now-s.lidAt;if(s.openMs>9000){tcFail('The lid was open too long. A week later, the plate is speckled with mold.');return;}
+    renderClone(s.placed?'Lid back on. Seal the edge with parafilm.':'Lid back on.');return;
+  case 'agar':
+    if(!s.lid){renderClone('The lid is still on the plate.');return;}
+    if(!s.onBlade){renderClone('Nothing on the blade yet.');return;}
+    s.onBlade=false;s.placed=true;renderClone('Tissue down on the agar. Close the lid.');return;
+  case 'film':
+    if(!s.placed){renderClone('Nothing to seal yet.');return;}
+    if(s.lid){renderClone('Close the lid before you seal it.');return;}
+    s.done=true;state.inv.mushroom=false;state.inv.plate=true;renderInv();if(typeof addNote==='function')addNote('Cloned an oyster mushroom onto agar in the still air box. Plate is in the backpack.');
+    mB.innerHTML='<p>Sealed, labeled, dated. In a few days, white mycelium will reach out from the tissue across the agar.</p>'+'<svg class="tcscene" viewBox="0 0 600 160"><ellipse cx="300" cy="80" rx="150" ry="50" fill="#e8f0f4" stroke="#1c110a" stroke-width="3"/><ellipse cx="300" cy="78" rx="130" ry="40" fill="#e8d070"/><rect x="290" y="70" width="20" height="14" fill="#ffffff"/>'+[0,1,2,3,4,5,6,7].map(function(i){var a=i/8*6.283;return '<path d="M300 77 L'+(300+Math.cos(a)*60)+' '+(77+Math.sin(a)*20)+'" stroke="#ffffff" stroke-width="3" opacity=".7"/>';}).join('')+'<path d="M160 70 h280" stroke="#b0331f" stroke-width="3" opacity=".5"/></svg>';
+    say('Clean clone. Into the incubator.');speak('Clean tissue. Now we wait.');return;}}
+
+/* ================= THE KITCHEN ================= */
+state.room='cabin';state.k={water:false,fridge:false,cooker:0,jars:false,food:false,bowlWater:true,mist:true,inoc:false,poured:false};
+var DOOR_Y=[264,308];
+var bgK=document.createElement('canvas');bgK.width=W;bgK.height=H;
+function paintKitchen(){var keep=b;b=bgK.getContext('2d');seed=611;
+  R('#1a110a',0,0,W,H,b);
+  for(var y=0;y<CY;y++){var l=BL*y/CY,r=W-(W-BR)*y/CY;R(y%6<1?'#1f150d':'#24170e',l,y,r-l,1,b);}
+  for(var k=0;k<5;k++){var xb=BL+(BR-BL)*(k+.5)/5,xf=W*(k+.5)/5;for(var y2=0;y2<CY;y2++){var t=y2/CY,x=xf+(xb-xf)*t,w=Math.round(14-6*t);R('#3a2414',x-w/2,y2,w,1,b);}}
+  for(var i=0;i<7;i++){var y0=CY+i*15,c=LOG[i%4];R(c,BL,y0,BR-BL,15,b);R('#7a5233',BL,y0+1,BR-BL,2,b);R('#3a2414',BL,y0+12,BR-BL,3,b);R('#b9a98a',BL,y0+14,BR-BL,1,b);
+    for(var s=0;s<26;s++)R('rgba(40,24,12,.45)',BL+rnd()*(BR-BL-20),y0+4+Math.floor(rnd()*7),6+rnd()*16,1,b);}
+  for(var x=0;x<BL;x++)paintSideCol(x,CY*x/BL,H-225*x/BL,.72);
+  for(var x2=BR;x2<W;x2++){var u=(W-x2)/(W-BR);paintSideCol(x2,CY*u,H-225*u,.62);}
+  // terracotta tile floor
+  var NR=22,rows=[];for(k=0;k<=NR;k++)rows.push(BY+225*Math.pow(k/NR,1.35));var ri=0;
+  for(var yy=BY;yy<H;yy++){while(ri<NR-1&&yy>=rows[ri+1])ri++;var L=leftX(yy),Rr=rightX(yy),wd=Rr-L,top=rows[ri],grout=(yy===Math.floor(top));
+    for(var j=0;j<18;j++){var xa=L+wd*j/18,xb2=L+wd*(j+1)/18,col=['#9a5a3a','#a4643f','#8e5334','#a06040','#94573a'][(j*7+ri*3)%5];
+      R(grout?'#4a3024':col,xa,yy,Math.max(1,xb2-xa),1,b);R('#4a3024',xa,yy,1,1,b);if(!grout&&rnd()<.05)R(shadeHex(col,.85),xa+rnd()*(xb2-xa),yy,2,1,b);}}
+  R('#2a180c',BL,BY-2,BR-BL,3,b);
+  // white subway tile backsplash behind the counters
+  for(var by=70;by<112;by++)for(var bx=104;bx<340;bx++){var row=Math.floor((by-70)/5),off=row%2?6:0,gl=((bx-104+off)%12===0)||((by-70)%5===0);R(gl?'#b8b0a0':((bx+by)%9===0?'#e8e2d6':'#ddd6c8'),bx,by,1,1,b);}
+  // window over the sink
+  R('#2a180c',124,38,72,50,b);for(var wy=42;wy<84;wy++)R(wy<64?'#101a33':'#162442',128,wy,64,1,b);
+  b.save();b.beginPath();b.rect(128,42,64,42);b.clip();for(var s2=0;s2<10;s2++)R('#dfe6ff',128+rnd()*64,42+rnd()*18,1,1,b);ell('#f3ecc8',176,52,4,4,b);
+  for(var tr=0;tr<8;tr++){var tx=130+tr*8+rnd()*4,th=12+rnd()*12;for(var ty=0;ty<th;ty++){var tw=Math.round(ty*.35)+1;R('#0b1a14',tx-tw,84-th+ty,tw*2,1,b);}}b.restore();
+  R('#3a2414',158,42,3,42,b);R('#3a2414',128,62,64,2,b);R('#4a2e18',120,86,80,4,b);R('#6b4527',120,86,80,1,b);
+  [[132,'#3f8a3a'],[150,'#5a8a4a'],[168,'#4f9a5a']].forEach(function(h,i){R('#a85a32',h[0],80,8,6,b);R('#c06a3a',h[0],80,8,1,b);for(var l=0;l<7;l++)R(h[1],h[0]+1+((l*3)%6),72+l%4+(i===1?-2:0),2,2,b);});
+  // open shelves with mason jars
+    // lab side: white panel walls and pale vinyl floor right of the dividing wall
+  for(var ly=30;ly<135;ly++)for(var lx=428;lx<560;lx++)R(((lx-428)%22===0)?'#9aa0a6':(ly<34?'#e4e8ec':'#d0d4d8'),lx,ly,1,1,b);R('#8a9096',428,133,132,2,b);
+  for(var rx=560;rx<W;rx++){var ru=(W-rx)/(W-BR),rt=CY*ru,rb=H-225*ru;R((rx%14===0)?'#8a9096':'#b4b8bc',rx,rt,1,rb-rt,b);}
+  for(var fy=BY;fy<H;fy++){var wx=398+(fy-135)*32/225,fr=rightX(fy);for(var fx=Math.ceil(wx);fx<fr;fx++){var c=((fy-BY)%9===0)?'#a8adb2':(((fx*7+fy*3)%23===0)?'#c4c8cc':'#bcc0c4');R(c,fx,fy,1,1,b);}}
+  for(var sh=0;sh<2;sh++){var sy=50+sh*18;R('#8a8e94',446,sy,80,3,b);R('#b8bcc0',446,sy,80,1,b);
+    for(var jx=450;jx<522;jx+=10){R('rgba(220,235,240,.5)',jx,sy-11,7,11,b);R('#c9a867',jx,sy-12,7,2,b);R(sh?'#e8e0c8':'#c9a24a',jx+1,sy-7,5,6,b);}}
+  // pendant lamp over the barrel table
+  R('#222',300,0,1,62,b);for(var py=0;py<9;py++){var pw=3+py;R(py<2?'#c9a867':'#8c6b2e',300-pw,62+py,pw*2+1,1,b);}R('#ffe2a0',293,71,15,1,b);
+  // the clean zone: a mat taped off in the corner
+  for(var my=286;my<350;my++){var t2=(my-286)/64,ml=Math.max(436,398+(my-135)*32/225+6),mr=Math.min(rightX(my)-8,604+t2*12);for(var mx=ml;mx<mr;mx++){var edge=(my<289||my>346||mx<ml+3||mx>mr-4);R(edge?(((mx+my)>>2)%2?'#e8c840':'#1c1c1c'):((mx+my)%7===0?'#bcc0c4':'#c9cdd0'),mx,my,1,1,b);}}
+
+  paintDividerBG();paintDoorway(b,17,36,leftWallAt,'#7a5233','#6b4527');paintKitchenExtras();paintDivider();
+  b=keep;}
+
+/* ---- kitchen objects ---- */
+function drawCounter(){
+  for(var y=108;y<117;y++){var t=(y-108)/8;R(y===108?'#5a5a60':'#3c3d42',106-2*t,y,232+4*t,1);}R('#2a2b30',104,116,236,1);
+  R('#4f6a58',104,117,236,33);R('#3f5a48',104,148,236,2);
+  for(var cx2=106;cx2<330;cx2+=30){if(cx2>=194&&cx2<244)continue;R('#5f7a68',cx2+2,121,26,24);R('#3f5a48',cx2+2,121,26,1);R('#c9a867',cx2+22,131,2,5);}
+  R('#a8acb0',196,118,44,30);R('#c8ccd0',196,118,44,2);R('#8a8e92',198,124,40,1);R('#6a6e72',210,121,16,2);R('#2a2b30',196,147,44,1);
+  ell('#1e2226',160,112,20,3);ell(state.k.water?'#4a7a9a':'#2a3036',160,112,16,2);
+  R('#b0b4b8',158,95,3,15);R('#b0b4b8',158,94,10,2);R('#b0b4b8',166,94,2,5);R('#80848a',163,107,6,2);
+  if(state.k.water&&!reduce){for(var wy=99;wy<111;wy++)R((wy+T)%3?'#9ac8e8':'#d8f0ff',166,wy,1,1);}
+  R('#1a1a1c',276,108,58,8);[[286,110],[304,110],[322,110],[295,113]].forEach(function(b2,i){var on=(i===0&&state.k.cooker>0);ell(on?'#e04a1a':'#3a3a3e',b2[0],b2[1],4,1);if(on&&!reduce&&T%6<3)R('#ffa040',b2[0]-1,b2[1],3,1);});
+  // pressure cooker on the back-left burner
+  R('#9a9ea4',279,93,16,15);R('#c8ccd0',279,93,16,2);R('#6a6e74',277,91,20,3);R('#2a2b30',285,88,4,3);R('#e8c840',291,89,3,2);R('#1a1a1c',275,98,3,2);R('#1a1a1c',295,98,3,2);
+  // range hood
+  drawCounterStuff();
+  R('#7a7e84',278,46,56,6);for(var hy=52;hy<70;hy++){var hw=Math.round(18+(hy-52)*.6);R('#9a9ea4',306-hw,hy,hw*2,1);}R('#5a5e64',284,69,44,2);
+}
+function drawFridge(){var o=state.k.fridge;
+  R('#2a2b30',342,40,54,112);for(var y=42;y<150;y++){var r=y<48?(48-y):0;R(y<44?'#b8dccb':'#9ec7b6',344+r/2,y,50-r,1);}R('#7aa896',344,94,50,2);
+  R('#e0e4e8',347,58,3,24);R('#e0e4e8',347,100,3,30);[[356,52,'#5a8ac0'],[370,57,'#8a8f96'],[358,74,'#b0331f'],[372,104,'#4f8a4a'],[358,110,'#c9a24a']].forEach(function(pp){R('#f4f0e8',pp[0],pp[1],10,11);R(pp[2],pp[0]+1,pp[1]+1,8,7);R('#2a2b30',pp[0]+1,pp[1]+6,8,1);R('#d0402c',pp[0]+4,pp[1]-1,3,2);});
+  if(o){R('#f4f0d8',346,46,38,100);for(var sh=70;sh<140;sh+=24)R('#c8c4b0',346,sh,38,1);R('#e8e2c0',350,52,8,14);R('#9ac0e8',362,56,6,10);R('#c9a24a',350,74,10,8);R('#e05a3a',364,78,8,6);R('#d8d0c0',350,98,22,6);R('#4f9a5a',370,120,10,12);R('#9ec7b6',384,46,10,100);}
+  for(var tp=0;tp<5;tp++)R('#3f8a3a',348+tp*9,36+(tp%2),3,3);for(var vy=40;vy<66;vy++)R('#3a5a2a',393,vy,1,1);
+}
+function drawBarrel(){
+  ell('rgba(0,0,0,.4)',300,262,26,4);
+  for(var y=212;y<262;y++){var t=(y-212)/50,w=Math.round(20+Math.sin(t*Math.PI)*4);for(var x=-w;x<w;x++){var c=((x+40)%6===0)?'#3a2414':(x<-w*.4?'#7a5233':(x<w*.4?'#6b4527':'#4a2e18'));R(c,300+x,y,1,1);}}
+  [218,236,254].forEach(function(hy){var w=Math.round(20+Math.sin((hy-212)/50*Math.PI)*4);R('#3a3a3e',300-w,hy,w*2,2);R('#5a5a60',300-w,hy,w*2,1);});
+  ell('rgba(200,225,235,.28)',300,211,44,11);R('rgba(255,255,255,.4)',268,206,24,1);ell('rgba(160,190,200,.5)',300,212,44,1);
+  // globe decanter of whiskey + two tumblers
+  R('#8c6b2e',295,207,10,2);for(var dy=-7;dy<=7;dy++){var dw=Math.round(Math.sqrt(49-dy*dy));R(dy>0?'#b8762a':'rgba(220,235,240,.35)',300-dw,199+dy,dw*2+1,1);}
+  R('rgba(255,255,255,.55)',296,195,2,2);R('rgba(220,235,240,.5)',299,189,3,4);R('#c9a867',298,187,5,2);for(var m=0;m<5;m++)R('rgba(120,80,30,.4)',294+m*3,200,1,1);
+  [[278,206],[318,207]].forEach(function(g2){R('rgba(220,235,240,.45)',g2[0],g2[1]-6,6,7);R('#b8762a',g2[0]+1,g2[1]-2,4,2);R('rgba(255,255,255,.5)',g2[0],g2[1]-6,1,5);});
+  if(state.k.poured){R('#b8762a',279,201,4,3);}
+}
+function drawBowls(){ell('rgba(0,0,0,.35)',104,313,9,2);ell('#3a6a8a',104,310,8,3);ell('#2a4a6a',104,309,6,2);if(state.k.food){for(var i=0;i<9;i++)R(i%2?'#8a5a2a':'#a87038',100+(i*3)%9,308+(i%2),2,1);}
+  ell('rgba(0,0,0,.35)',128,313,9,2);ell('#c9a867',128,310,8,3);ell(state.k.bowlWater?'#6a9ac0':'#4a3a2a',128,309,6,2);if(state.k.bowlWater)R('#c8e4f4',125,308,3,1);}
+function drawSAB(){g.save();g.translate(18,0);drawSABBody();g.restore();}
+function drawSABBody(){
+  R('#5a3a20',420,286,80,5);R('#7a5233',420,286,80,1);R('#3a2414',424,291,4,17);R('#3a2414',492,291,4,17);
+  R('rgba(200,225,240,.22)',428,252,64,34);R('rgba(230,245,255,.55)',428,252,64,2);R('rgba(230,245,255,.35)',428,252,1,34);R('rgba(230,245,255,.35)',491,252,1,34);R('rgba(160,190,210,.5)',426,250,68,3);
+  ell('#1a1a1c',446,274,6,5);ell('#1a1a1c',474,274,6,5);ell('#3a3a3e',446,274,7,6);ell('#1a1a1c',446,274,5,4);ell('#3a3a3e',474,274,7,6);ell('#1a1a1c',474,274,5,4);
+  R('rgba(220,235,240,.5)',452,262,8,12);R('#c9a867',452,261,8,2);R('#e8e0c8',453,266,6,7);R('#5a6ad0',466,266,10,3);R('#e04a1a',468,262,2,4);if(state.k.inoc)R('#ffffff',454,267,4,3);
+}
+function drawTent(){
+  R('#3a3a3e',522,190,2,140);R('#3a3a3e',598,190,2,140);R('#3a3a3e',522,190,78,2);
+  for(var sh=220;sh<330;sh+=28){R('#6a6a70',524,sh,74,2);
+    for(var bk=530;bk<590;bk+=20){R('#e8e2d0',bk,sh-14,12,14);R('#c8c0a8',bk,sh-14,12,1);
+      if((bk+sh)%3===0){for(var r=0;r<5;r++)R(r<2?'#8a9ab0':'#6a7a90',bk-2+r,sh-18+r,8-r,1);}else{for(var q=0;q<10;q++)R('#f4f0e4',bk+2+(q%5),sh-19+Math.floor(q/5)*2,1,3);}}}
+  R('rgba(210,230,245,.16)',520,188,82,144);R('rgba(235,245,255,.4)',520,188,82,2);R('rgba(235,245,255,.3)',520,188,1,144);R('rgba(235,245,255,.3)',601,188,1,144);
+  for(var z=196;z<328;z+=3)R('#8a8e94',560,z,1,1);R('#e0f0ff',526,192,70,2);
+}
+function drawFig(){R('#3a3a3e',544,140,20,12);R('#5a5a60',544,140,20,2);R('#5a3a20',553,96,2,44);
+  [[546,104],[560,98],[548,88],[562,112],[552,76],[544,120],[560,126],[554,66]].forEach(function(l,i){ell(i%2?'#2f5a30':'#3a6a3a',l[0],l[1],5,6);R('#4f8a4a',l[0]-1,l[1]-4,2,2);R('#24452a',l[0],l[1]-3,1,7);});}
+function drawFern(){R('#a85a32',86,140,20,12);R('#c06a3a',86,140,20,1);
+  for(var f=0;f<9;f++){var a=-Math.PI*(.12+f*.095),len=18+(f%3)*4;for(var s=0;s<len;s++){var x=96+Math.cos(a)*s,y=140+Math.sin(a)*s*.9+s*s*.02;R('#4f8a3a',x,y,1,1);if(s%2===0){R('#5f9a4a',x-1,y-1,1,1);R('#5f9a4a',x+1,y-1,1,1);}}}}
+function drawZZ(){R('#2a2b30',600,332,18,14);R('#4a4b50',600,332,18,2);
+  [[-4,30],[0,38],[4,28],[8,24],[-8,22]].forEach(function(st){for(var y=0;y<st[1];y++){var x=609+st[0]+Math.round(st[0]*y/st[1]*.5);R('#3a5a2a',x,332-y,1,1);if(y>4&&y%3===0){R('#2f6a36',x-2,332-y,2,2);R('#3f8a46',x+1,332-y-1,2,2);}}});}
+function drawKitchenDecor(){
+  drawClock();
+  if(state.k.mist&&!reduce&&T%4===0)parts.push({k:'mist',x:526+Math.random()*70,y:210+Math.random()*110,vx:(Math.random()-.5)*.1,vy:-.05,l:1,d:.01,r:1});
+  // hanging pothos over the sink
+  line('#c9a867',150,0,156,30);line('#c9a867',168,0,162,30);R('#e9dfc2',153,30,12,6);for(var v=0;v<3;v++){for(var y=36;y<60+v*6;y++){var x=154+v*5+Math.round(Math.sin(y/5+v)*1.5);R('#3a5a2a',x,y,1,1);if(y%4===0)R('#4f9a4a',x-1,y,3,2);}}
+}
+var KITCHEN_OBJ=[
+ {id:'tocabin',name:'Back to the cabin',box:[10,150,30,165],wall:true,spot:[46,288],face:'left'},
+ {id:'counter',name:null,box:null,base:152,foot:[102,138,240,15],draw:drawCounter},
+ {id:'ksink',name:'Sink',box:[138,92,44,24],deskItem:true,spot:[160,170],face:'up'},
+ {id:'kdish',name:'Dishwasher',box:[196,118,44,30],deskItem:true,spot:[218,170],face:'up'},
+ {id:'kstove',name:'Stove and pressure cooker',box:[274,86,62,30],deskItem:true,spot:[300,170],face:'up'},
+ {id:'kfridge',name:'Fridge',box:[342,36,54,116],base:152,foot:[342,138,54,15],spot:[369,170],face:'up',draw:drawFridge},
+ {id:'kfig',name:'Fiddle-leaf fig',box:[356,253,30,92],base:346,foot:[360,334,24,12],spot:[344,342],face:'right',draw:function(){g.save();g.translate(-182,193);drawFig();g.restore();},plant:true},
+ {id:'stool1',name:null,box:null,base:258,foot:[249,254,11,5],draw:function(){drawStool(254,258);}},
+ {id:'stool2',name:null,box:null,base:258,foot:[341,254,11,5],draw:function(){drawStool(346,258);}},
+ {id:'stool3',name:null,box:null,base:240,foot:[267,236,11,5],draw:function(){drawStool(272,240);}},
+ {id:'stool4',name:null,box:null,base:240,foot:[323,236,11,5],draw:function(){drawStool(328,240);}},
+ {id:'cattree',name:'Cat tree',box:[48,134,40,104],base:237,foot:[50,226,36,12],spot:[98,236],face:'left',draw:drawCatTree},
+ {id:'kcart',name:'Dehydrator cart',box:[166,270,64,68],base:336,foot:[168,326,60,10],spot:[198,350],face:'up',draw:drawCart},
+ {id:'kbins',name:'Compost and trash',box:[96,170,36,28],base:196,foot:[98,186,32,10],spot:[142,206],face:'left',draw:function(){g.save();g.translate(36,8);drawBins();g.restore();}},
+ {id:'kchalk',name:'Grocery list',box:[38,60,34,56],wall:true,spot:[104,212],face:'left'},
+ {id:'kclock',name:'Clock',box:[226,40,20,20],wall:true,spot:[236,172],face:'up'},
+ {id:'kpetri',name:'Petri dishes',box:[444,84,86,36],wall:true,spot:[486,172],face:'up'},
+ {id:'ksnake',name:'Snake plant',box:[80,72,32,82],base:153,foot:[84,141,24,12],spot:[96,172],face:'up',draw:function(){g.save();g.translate(56,-174);drawSnake();g.restore();},plant:true},
+ {id:'kbarrel',name:'Barrel table',box:[274,208,52,54],base:262,foot:[278,248,46,14],spot:[300,284],face:'up',draw:drawBarrel},
+ {id:'kdecanter',name:'Whiskey decanter',box:[291,184,18,25],deskItem:true,spot:[300,284],face:'up'},
+ {id:'kbowl',name:'Felix\'s food bowl',box:[94,302,20,14],base:314,spot:[104,330],face:'up',draw:drawBowls},
+ {id:'kwater',name:'Water bowl',box:[118,302,20,14],spot:[128,330],face:'up'},
+ {id:'ksab',name:'Still air box',box:[438,248,80,60],base:308,foot:[440,294,76,14],spot:[478,326],face:'up',draw:drawSAB},
+ {id:'ktent',name:'Fruiting chamber',box:[518,186,86,146],base:331,foot:[520,318,82,13],spot:[508,342],face:'right',draw:drawTent}
+];
+POSTERS.forEach(function(pp,i){var a=rightWallAt(pp.x0),z=rightWallAt(pp.x1),y0=Math.min(a.top+(a.bot-a.top)*.24,z.top+(z.bot-z.top)*.24),y1=Math.max(a.top+(a.bot-a.top)*.5,z.top+(z.bot-z.top)*.5);
+  KITCHEN_OBJ.push({id:pp.id,name:'Poster',box:[pp.x0,y0,pp.x1-pp.x0+1,y1-y0],wall:true,spot:[552+i*5,200+i*12],face:'right'});});
+KITCHEN_OBJ.forEach(function(o){byId[o.id]=o;});KITCHEN_OBJ.push(FELIX_REF());
+function FELIX_REF(){return byId.felix;}
+var CABIN_OBJ=OBJ;
+CABIN_OBJ.push({id:'tokitchen',name:'Kitchen',box:[604,160,24,150],wall:true,spot:[592,288],face:'right'});byId.tokitchen=CABIN_OBJ[CABIN_OBJ.length-1];
+CABIN_OBJ.push({id:'kboots',name:'Foraging boots',box:[108,322,50,26],base:347,spot:[132,354],face:'up',draw:function(){g.save();g.translate(80,3);drawBoots();g.restore();}});byId.kboots=CABIN_OBJ[CABIN_OBJ.length-1];
+INTERACTIVE=OBJ.filter(function(o){return o.name;});
+var CAT_SPOTS_K=[[110,326],[96,238],[96,238],[160,182],[70,300],[360,230],[230,320]];
+
+/* ---- moving between rooms ---- */
+var fade=document.getElementById('fade'),transit=false;
+function goRoom(to){if(transit||state.room===to)return;transit=true;var from=state.room;
+  var felixCome=FX.room===from&&FX.state!=='sleep'&&Math.hypot(FX.x-P.x,FX.y-P.y)<320;
+  fade.classList.add('on');
+  setTimeout(function(){state.room=to;OBJ=to==='kitchen'?KITCHEN_OBJ:CABIN_OBJ;INTERACTIVE=OBJ.filter(function(o){return o.name;});
+    if(to==='kitchen'){P.x=60;P.y=288;P.dir='right';}else{P.x=578;P.y=288;P.dir='left';}P.path=[];P.then=null;keys={};
+    if(felixCome){FX.room=to;FX.x=to==='kitchen'?38:600;FX.y=290;FX.path=[];FX.state='sit';FX.mode='sit';FX.timer=20;FX.follow=T+900;}
+    say(to==='kitchen'?(state.k.seen?'The kitchen.':'The kitchen, with the lab through the doorway on the right.'):'Back in the cabin.');state.k.seen=true;
+    fade.classList.remove('on');setTimeout(function(){transit=false;},250);},260);}
+function checkDoors(){if(transit)return;
+  if(state.room==='cabin'&&P.y>DOOR_Y[0]&&P.y<DOOR_Y[1]&&P.x>rightX(P.y)-4)goRoom('kitchen');
+  else if(state.room==='kitchen'&&P.y>DOOR_Y[0]&&P.y<DOOR_Y[1]&&P.x<leftX(P.y)+4)goRoom('cabin');}
+
+/* ---- kitchen interactions ---- */
+var FRIDGE=['Oat milk, leftover lo mein, and a stack of agar plates that are definitely not food.','A jar of lion\'s mane, a block of cheddar, and liquid culture syringes on the door. Don\'t mix those up.','Felix\'s wet food, labeled in Sharpie: FELIX. DO NOT GIVE TO FELIX BEFORE 6PM.'];
+var DISH=['The dishwasher. Clean or dirty? Nobody in this cabin knows.','Somebody put the pressure cooker gasket in here again. Fishing it out.'];
+function kitchenExamine(o){var k=state.k;switch(o.id){
+  case 'tocabin':goRoom('cabin');return true;
+  case 'tokitchen':goRoom('kitchen');return true;
+  case 'ksink':k.water=!k.water;say(k.water?'Laura runs the tap.':'Laura shuts off the tap.');return true;
+  case 'kdish':say(DISH[(k.d=(k.d||0)+1)%DISH.length]);return true;
+  case 'kfridge':k.fridge=!k.fridge;say(k.fridge?FRIDGE[(k.f=(k.f||0)+1)%FRIDGE.length]:'Laura closes the fridge.');return true;
+  case 'kstove':
+    if(k.jars){say('The grain jars are sterilized and cooling. The still air box is ready when you are.');return true;}
+    if(k.cooker>0){say('The pressure cooker is still hissing. Give it a minute.');return true;}
+    k.cooker=1;say('Laura loads the grain jars, locks the lid and brings it up to 15 PSI.');
+    setTimeout(function(){k.cooker=0;k.jars=true;say('Ninety minutes at 15 PSI, in cabin time. The grain jars are sterile and cooling.');if(typeof addNote==='function')addNote('Grain jars sterilized in the pressure cooker. Next: the still air box.');},reduce?400:9000);return true;
+  case 'kbarrel':say('A whiskey barrel Laura turned into a table, topped with glass.');speak((k.bt=(k.bt||0)+1)%2===1?'I made this one myself. Old whiskey barrel, new glass top, a whole weekend of sanding.':'Still proud of this table. The hoops took forever to get tight again.');return true;
+  case 'kdecanter':if(state.case&&state.case.sealed){k.poured=true;say('Laura pours a dram from the globe decanter.');speak('To closed cases.');}else{say('A globe decanter of whiskey on the glass-topped barrel.');speak('Not until the case is closed.');}return true;
+  case 'kbowl':if(k.food){say('The bowl\'s still full. Felix is being dramatic.');return true;}k.food=true;say('Kibble rattles into the bowl.');callFelixToBowl();return true;
+  case 'kwater':k.bowlWater=true;say('Fresh water for Felix. He\'ll still drink from the tap.');return true;
+  case 'kfig':say('A fiddle-leaf fig. It drops a leaf every time it\'s moved, so it never gets moved.');return true;
+  case 'ksnake':say('Another snake plant. They multiply when nobody\'s looking.');return true;
+  case 'kzz':say('A ZZ plant, guarding the clean zone. Unkillable, which is the point.');return true;
+  case 'ktent':k.mist=!k.mist;say(k.mist?'The humidifier kicks back on. Ninety percent humidity, blue oysters and lion\'s mane.':'Laura switches the mister off to check the blocks. Pins on two of the oysters.');return true;
+  case 'ksab':sabMenu();return true;
+  case 'kcart':say('The food dehydrator: trays of sliced oysters and shiitake. The whole kitchen smells like umami.');return true;
+  case 'kbins':say('Compost and trash. Coffee grounds and spent mushroom blocks go in the green one. The garden worms are thrilled.');return true;
+  case 'kboots':say('Laura\'s foraging boots, still muddy from the last morel hunt, next to the mesh collecting bag.');return true;
+  case 'kclock':var dd=new Date();say('The kitchen clock says '+dd.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'.');speak(dd.getHours()>=22||dd.getHours()<5?'Of course it\'s this late.':'Still time to close a case today.');return true;
+  case 'kchalk':openModal('GROCERY LIST','<div class="chalk"><p>oat milk</p><p>rye berries (for spawn)</p><p>gypsum</p><p>agar powder</p><p>lemons</p><p>coffee!!</p><p><b>CHURUS (URGENT)</b></p><p>whiskey (for the table)</p></div>');return true;
+  case 'kpetri':say('Agar plates: clean oyster and lion\'s mane transfers, and one with a suspicious green halo. That one goes in the trash.');return true;
+  case 'cattree':if(FX.room==='kitchen'&&FX.state!=='sleep'){FX.goal=null;felixGo(96,238);say('Felix eyes the top perch, then goes for it.');}else say('Felix\'s cat tree. The top perch has the best view of the kibble.');return true;
+  case 'pSplice':case 'pInoc':case 'pBags':case 'pSpecies':openModal('POSTER',posterSVG(o.id));return true;}
+  return false;}
+function callFelixToBowl(){if(FX.room!=='kitchen'){FX.room='kitchen';FX.x=38;FX.y=290;FX.path=[];setTimeout(function(){say('Felix sprints in from the cabin. He heard that from three rooms away.');},300);}
+  FX.sleepPoke=0;FX.goal='bowl';if(state.room==='kitchen')felixGo(112,322);else{FX.state='sit';FX.mode='sit';FX.timer=40;}}
+
+/* ---- the inoculation challenge ---- */
+var sab=null;
+function openSAB(){
+  if(!state.k.jars){openModal('STILL AIR BOX','<p>A clear tote with two arm holes: the poor grower\'s clean room.</p><p class="dim2">The grain jars need sterilizing first. The pressure cooker is on the stove.</p>');return;}
+  sab={step:0,wiped:false,flames:0,wedges:0,end:0,fail:false};renderSAB();}
+function renderSAB(){var s=sab,notes=!!state.inv.notes,steps=['Wipe down the box and your gloves with 70% isopropyl','Flame the scalpel until it glows (three passes)','Open the jar and transfer three wedges of colonized agar before the window closes','Seal the jars'];
+  var html='<p>'+(notes?'Your inoculation notes are open on the counter: <i>flame, then flame again; four-hour window; Trichoderma waits for mistakes.</i>':'<span class="dim2">You\'d do better with your inoculation notes from the bookshelf, but here goes.</span>')+'</p><ol class="steps">'+steps.map(function(t,i){return '<li class="'+(i<s.step?'done':(i===s.step?'now':''))+'">'+t+'</li>';}).join('')+'</ol>';
+  if(s.step===0)html+='<div class="acts"><button class="pbtn" id="sabGo">WIPE IT DOWN</button></div>';
+  if(s.step===1)html+='<div class="acts"><button class="pbtn" id="sabGo">FLAME ('+s.flames+'/3)</button></div>';
+  if(s.step===2)html+='<div class="win"><div class="winbar"><span id="winFill"></span></div><span id="winTxt">OPEN-AIR WINDOW</span></div><div class="acts"><button class="pbtn" id="sabGo">TRANSFER A WEDGE ('+s.wedges+'/3)</button></div>';
+  if(s.step===3)html+='<div class="acts"><button class="pbtn primary" id="sabGo">SEAL THE JARS</button></div>';
+  openModal('STILL AIR BOX · GRAIN TRANSFER',html);document.getElementById('sabGo').addEventListener('click',sabAct);document.getElementById('sabGo').focus();
+  if(s.step===2&&!s.end){s.end=Date.now()+(notes?9000:6500);s.iv=setInterval(sabTick,100);}}
+function sabTick(){var left=Math.max(0,sab.end-Date.now()),tot=state.inv.notes?9000:6500,f=document.getElementById('winFill');if(!f){clearInterval(sab.iv);return;}
+  f.style.width=(left/tot*100)+'%';document.getElementById('winTxt').textContent='OPEN-AIR WINDOW: '+(left/tot*4).toFixed(1)+' h left';
+  if(left<=0){clearInterval(sab.iv);sabFail('The window closed with the jar open. A week later: green fuzz. Trichoderma wins this round.');}}
+function sabAct(){var s=sab;
+  if(s.step===0){s.step=1;renderSAB();return;}
+  if(s.step===1){s.flames++;burst(486,262,6);if(s.flames>=3)s.step=2;renderSAB();return;}
+  if(s.step===2){s.wedges++;if(s.wedges>=3){clearInterval(s.iv);s.step=3;}renderSAB();return;}
+  if(s.step===3){state.k.inoc=true;var clue=state.case&&state.case.soil;
+    if(clue&&typeof caseStep==='function')caseStep('journal','Ran the grain transfer: the insider knew the strain\'s exact tolerances, and site 2 was engineered to match them.');
+    mB.innerHTML='<p>Lids on, filters taped. The jars go into the incubator.</p>'+(clue?'<div class="clue">As you seal the last jar, it clicks: the insider knew the strain\'s exact temperature band, moisture level and failure modes. Site 2 was engineered to match them, so the stolen strain would look like a spontaneous field success.</div>':'<p class="dim2">Clean transfer. Colonization in two to three weeks.</p>');
+    say('Clean transfer. Jars into the incubator.');}}
+function sabFail(msg){mB.innerHTML='<p>'+msg+'</p><div class="acts"><button class="pbtn" id="sabRe">START OVER</button></div>';document.getElementById('sabRe').addEventListener('click',function(){sab={step:0,flames:0,wedges:0,end:0};renderSAB();});}
+
+/* ---- kitchen light ---- */
+function lightKitchen(){
+  lc.globalCompositeOperation='source-over';lc.clearRect(0,0,W,H);lc.fillStyle=state.music==='party'?'rgba(8,4,20,.8)':'rgba(10,8,22,.62)';lc.fillRect(0,0,W,H);
+  lc.globalCompositeOperation='destination-out';
+  hole(300,150,170,.95);hole(240,112,150,.6);hole(160,64,60,.4);hole(560,250,95,.6);if(state.k.fridge)hole(369,96,70,.8);hole(500,90,130,.75);if(state.k.cooker)hole(286,108,40,.5);hole(26,240,60,.5);
+  g.drawImage(lt,0,0);
+  g.save();g.globalCompositeOperation='lighter';glow(300,150,130,'rgba(255,200,120,.13)');glow(560,240,80,'rgba(170,215,255,.12)');if(state.k.fridge)glow(369,96,55,'rgba(220,240,255,.14)');glow(500,90,110,'rgba(225,240,255,.1)');g.restore();
+  if(state.music==='party')rave();}
+function emitKitchen(){
+  if(state.k.cooker&&Math.random()<.5)parts.push({k:'smoke',x:286+Math.random()*4,y:86,vx:(Math.random()-.5)*.2,vy:-.35-Math.random()*.2,l:1,d:.012,r:1});
+  if(FX.eating&&T%30===0)parts.push({k:'spark',x:FX.x-6,y:FX.y-4,vx:(Math.random()-.5)*.6,vy:-.6,l:1,d:.04});}
+paintKitchen();
+
 buildPrint();
-paintBG();
+paintBG();paintCabinDoorway();
 sheet.onload=function(){};
 requestAnimationFrame(frame);
 })();
 </script>
-
-
-</body></html>
+</body>
+</html>
