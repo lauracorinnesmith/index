@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0806">
 <meta name="theme-color" content="#120c08">
 <meta name="color-scheme" content="dark">
 <title>Laura Corinne Smith · The Cabin</title>
@@ -305,6 +309,19 @@ html.mobile .wb{padding:10px;gap:10px}html.mobile .wb p,html.mobile .wb li{font-
 .cbi:hover path:first-child,.cbi:focus-visible path:first-child{filter:brightness(1.12)}
 .docpage{position:relative;background:#efe6cf;color:#1c110a;padding:22px 16px 12px;border:2px solid #8a6a2a;margin-top:10px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}.docpage p{color:#1c110a}
 .doctab{position:absolute;left:14px;top:-12px;background:#d8bc80;border:2px solid #8a6a2a;padding:2px 10px;font-family:var(--pix);font-size:8px}
+.wheels{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}.wh{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wsym{display:grid;place-items:center;width:48px;height:48px;background:linear-gradient(#3a3e44,#1c1e22);border:3px solid #8a8e94;color:#e8c860;box-shadow:inset 0 3px 6px rgba(0,0,0,.6)}
+.cam{display:flex;flex-direction:column;align-items:center;gap:6px;margin-left:12px}.keyhole{width:30px;height:30px;border-radius:50%;background:radial-gradient(#c8ccd0,#6a6e74);border:2px solid #2a2a2e;position:relative}.keyhole::after{content:"";position:absolute;left:13px;top:6px;width:4px;height:16px;background:#1c1c1e}.keyhole.ready{box-shadow:0 0 0 3px rgba(240,196,106,.6)}
+.decoder{background:#efe6cf;color:#1c110a;border:2px solid #8a6a2a;padding:10px 12px;margin:10px 0;box-shadow:inset 0 0 0 4px #fff,2px 3px 0 rgba(0,0,0,.3)}.dctitle{font-family:var(--pix);font-size:8px;color:#8a2a22;margin-bottom:8px}
+.dcgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.dcgrid div{display:flex;align-items:center;gap:6px;justify-content:center;border:1px solid #c8bca0;padding:4px;color:#1c110a}.dcgrid b{font-family:var(--pix);font-size:12px}.dcfoot{font-size:15px;margin-top:6px;font-style:italic}
+.dcwrap summary{cursor:pointer;font-family:var(--pix);font-size:9px;color:#8a2a22;margin:8px 0}
+#showerFade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .8s ease;z-index:50;display:flex;align-items:center;justify-content:center}
+#showerFade.on{opacity:1;pointer-events:auto}#showerFade span{font-family:var(--ret);font-size:22px;color:#4a6a80;letter-spacing:.2em;opacity:.7;animation:steam 1.6s ease-in-out infinite alternate}
+@keyframes steam{from{transform:translateY(4px);opacity:.35}to{transform:translateY(-4px);opacity:.8}}
+#fullBtn{display:none}html.mobile #fullBtn{display:inline-flex}
+html.mobile #stageWrap{display:block;position:relative}
+html.mobile #game{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+html.mobile #joy{opacity:.28;border-width:1px}html.mobile #joy span{background:rgba(240,196,106,.5);border-width:1px}
 </style>
 </head>
 <body>
@@ -323,6 +340,7 @@ html.mobile .wb{padding:10px;gap:10px}html.mobile .wb p,html.mobile .wb li{font-
   <div id="hover"></div>
   <div id="timers" aria-live="polite"></div>
   <div id="fade" aria-hidden="true"></div>
+  <div id="showerFade" aria-hidden="true"><span>~ shhhhhhhh ~</span></div>
   <div id="bubble" aria-hidden="true"></div>
   <button id="prompt"><kbd>E</kbd><span id="promptText">Examine</span></button>
 </div>
@@ -2293,7 +2311,7 @@ function finishHarvest(s3){wbDone('harvest','Harvested the first flush.');mB.inn
 var DOORS={cabin:[{side:'right',y:[266,306],to:'kitchen'},{side:'right',y:[154,196],to:'bedroom'}],kitchen:[{side:'left',y:[266,306],to:'cabin'}],bedroom:[{side:'left',y:[154,196],to:'cabin'}]};
 var ROOMDIV={kitchen:true,bedroom:true};
 var ROOM_NAME={cabin:'the living room',kitchen:'the kitchen',bedroom:'the bedroom'};
-function doorSpawn(room,from){var d=DOORS[room].filter(function(x){return x.to===from;})[0],y=(d.y[0]+d.y[1])/2;return d.side==='right'?[rightX(y)-18,y,'left']:[leftX(y)+18,y,'right'];}
+function doorSpawn(room,from){var d=DOORS[room].filter(function(x){return x.to===from;})[0]||DOORS[room][0],y=(d.y[0]+d.y[1])/2;return d.side==='right'?[rightX(y)-18,y,'left']:[leftX(y)+18,y,'right'];}
 function goRoom(to){if(transit||state.room===to)return;transit=true;var from=state.room;
   var felixCome=FX.room===from&&FX.state!=='sleep'&&!FX.perch&&Math.hypot(FX.x-P.x,FX.y-P.y)<320;
   fade.classList.add('on');
@@ -2444,7 +2462,7 @@ function portrait(s){var c=document.createElement('canvas');c.width=24;c.height=
 var PORTRAIT={};SUSPECTS.forEach(function(s){PORTRAIT[s.id]=portrait(s);});
 function fileHTML(s){return '<div class="sfile"><div class="sclip" aria-hidden="true"></div><img class="sphoto" alt="Photo of '+s.name+'" src="'+PORTRAIT[s.id]+'"><div><div class="stab">PERSONNEL FILE · CONFIDENTIAL</div><h4>'+s.name+'</h4><div class="srole">'+s.role+'</div><p>'+s.bio+'</p><p class="snote">'+s.note+'</p></div></div>';}
 function openLetter(){var first=!state.case.letter;
-  openModal('A LETTER FROM THE CEO','<div class="letter"><div class="lh">LUMEN MYCOTECH</div><p>Dear Investigator,</p><p>I am writing because Lumen Mycotech is in serious trouble, and I need someone outside the company to find out why.</p><p>Our proprietary mycoremediation strain, internal batch code <b>0417</b>, is the foundation of everything we do. Midway through a major municipal cleanup contract, a second, nearly identical chemical spill turned up at a separate site owned by a shell company called Tallow Point Holdings. Days later, our main competitor, Verdance Biosciences, filed a patent claiming they had independently discovered our exact strain and degradation protocol.</p><p>I do not believe in coincidences of that size. I think the second spill was staged to manufacture prior art, and I think someone inside Lumen helped.</p><p>Only four people had the access to do it: <b>Dr. Ruth Halloran</b>, <b>Dr. James Okafor</b>, <b>Marisol Reyes</b> and <b>Dag Lindqvist</b>. Their personnel files are attached. Our internal records are in a case folder locked under the batch code.</p><p>The city\'s crew also recovered a live culture from the second site, and our lab has confirmed it is 0417. I am sending it to your cabin by courier. Please keep it cold and sterile.</p><p>Whoever did this, I need to know, and I need it to hold up.</p><p>With thanks,</p><p class="sig">E. Marchetti<br><span>Chief Executive Officer</span></p></div><div class="sfiles">'+SUSPECTS.map(function(s){return '<button class="sftab'+(state.sus.seen[s.id]?' seen':'')+'" data-sus="'+s.id+'"><img alt="" src="'+PORTRAIT[s.id]+'"><span>'+s.name+'</span></button>';}).join('')+'</div><div id="sfView"><p class="dim2">Open each attached file. They go up on the case board.</p></div>');
+  openModal('A LETTER FROM THE CEO','<div class="letter"><div class="lh">LUMEN MYCOTECH</div><p>Dear Investigator,</p><p>I am writing because Lumen Mycotech is in serious trouble, and I need someone outside the company to find out why.</p><p>Our proprietary mycoremediation strain, internal batch code <b>0417</b>, is the foundation of everything we do. Midway through a major municipal cleanup contract, a second, nearly identical chemical spill turned up at a separate site owned by a shell company called Tallow Point Holdings. Days later, our main competitor, Verdance Biosciences, filed a patent claiming they had independently discovered our exact strain and degradation protocol.</p><p>I do not believe in coincidences of that size. I think the second spill was staged to manufacture prior art, and I think someone inside Lumen helped.</p><p>Only four people had the access to do it: <b>Dr. Ruth Halloran</b>, <b>Dr. James Okafor</b>, <b>Marisol Reyes</b> and <b>Dag Lindqvist</b>. Their personnel files are attached. Our internal records reached you by courier last week; per your protocol, they are locked in your filing cabinet\'s secure compartment under our batch code.</p><p>The city\'s crew also recovered a live culture from the second site, and our lab has confirmed it is 0417. I am sending it to your cabin by courier. Please keep it cold and sterile.</p><p>Whoever did this, I need to know, and I need it to hold up.</p><p>With thanks,</p><p class="sig">E. Marchetti<br><span>Chief Executive Officer</span></p></div><div class="sfiles">'+SUSPECTS.map(function(s){return '<button class="sftab'+(state.sus.seen[s.id]?' seen':'')+'" data-sus="'+s.id+'"><img alt="" src="'+PORTRAIT[s.id]+'"><span>'+s.name+'</span></button>';}).join('')+'</div><div id="sfView"><p class="dim2">Open each attached file. They go up on the case board.</p></div>');
   mB.querySelectorAll('[data-sus]').forEach(function(b2){b2.addEventListener('click',function(){var s=SUS[b2.dataset.sus];document.getElementById('sfView').innerHTML=fileHTML(s);b2.classList.add('seen');
     if(!state.sus.seen[s.id]){state.sus.seen[s.id]=true;addNote('Read '+s.name+'\'s file.');if(SUSPECTS.every(function(q){return state.sus.seen[q.id];}))say('All four files read. They\'re pinned to the case board.');}});});
   if(first){caseStep('letter','A CEO\'s letter: one of four people leaked Lumen Mycotech\'s strain. The case folder is under batch code 0417.');state.inv.letter=true;renderInv();say('You took the case. Read the attached files.');}}
@@ -3124,6 +3142,125 @@ function cabinetExamine(o){if(o.id==='drawer'){openDrawer();return true;}
     log(o);done('cabinet');pin('casework');openCabinetDrawer(state.inv.cabkey&&!state.case.oldfile?'HIDDEN DRAWER':(state.case.letter&&!state.case.folder?'LUMEN CASE':null));say('The brass key turns.');return true;}
   return false;}
 var _v9ex=v9Examine;v9Examine=function(o){return cabinetExamine(o)||_v9ex(o);};
+
+/* ===================== V14: richer drawer, the secure compartment puzzle ===================== */
+SAVE_KEY='laura-cabin-save-v2';
+/* ---- desk drawer, redrawn in more detail ---- */
+function drawerSVG(){var I=state.inv,tubes=Math.max(0,3-(I.churu||0)),h='<svg class="tcscene" id="dwSvg" viewBox="0 0 600 330" role="group" aria-label="Inside the desk drawer"><defs>'+
+  '<linearGradient id="gBrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4dc8a"/><stop offset=".5" stop-color="#c9a24a"/><stop offset="1" stop-color="#8c6b2e"/></linearGradient>'+
+  '<linearGradient id="gSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef1f4"/><stop offset=".5" stop-color="#a8acb2"/><stop offset="1" stop-color="#6a6e74"/></linearGradient>'+
+  '<linearGradient id="gBlack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a52"/><stop offset=".4" stop-color="#1c1c20"/><stop offset="1" stop-color="#0a0a0c"/></linearGradient>'+
+  '<radialGradient id="gGlass" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="rgba(255,255,255,.55)"/><stop offset=".4" stop-color="rgba(200,230,245,.25)"/><stop offset="1" stop-color="rgba(120,160,190,.35)"/></radialGradient>'+
+  '<linearGradient id="gWood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a2414"/><stop offset=".5" stop-color="#5a3a20"/><stop offset="1" stop-color="#3a2414"/></linearGradient>'+
+  '<pattern id="pFelt" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#2e4a3a"/><circle cx="1" cy="2" r=".6" fill="#3a5a48"/><circle cx="4" cy="5" r=".5" fill="#26402f"/></pattern>'+
+  '<filter id="fSh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#000" flood-opacity=".45"/></filter></defs>'+
+  '<rect x="10" y="10" width="580" height="310" fill="#1e1208"/><path d="M36 26 H564 L544 304 H56 Z" fill="url(#gWood)" stroke="#140a04" stroke-width="4"/>';
+  for(var gr=0;gr<10;gr++)h+='<path d="M'+(40+gr*3)+' 30 Q'+(46+gr*2)+' 160 '+(58+gr*2)+' 300" stroke="rgba(0,0,0,.15)" fill="none"/><path d="M'+(560-gr*3)+' 30 Q'+(554-gr*2)+' 160 '+(542-gr*2)+' 300" stroke="rgba(0,0,0,.15)" fill="none"/>';
+  h+='<path d="M56 44 H544 L528 288 H72 Z" fill="url(#pFelt)"/><path d="M56 44 H544 L540 52 H60 Z" fill="rgba(0,0,0,.35)"/>';
+  // fountain pen
+  h+='<g class="dwi" data-it="fpen" tabindex="0" role="button" aria-label="Fountain pen" filter="url(#fSh)"><rect x="88" y="62" width="160" height="34" fill="transparent"/><rect x="96" y="74" width="96" height="12" rx="6" fill="url(#gBlack)"/><rect x="150" y="74" width="4" height="12" fill="url(#gBrass)"/><rect x="112" y="71" width="44" height="3" rx="1.5" fill="url(#gBrass)"/><circle cx="114" cy="72.5" r="2" fill="url(#gBrass)"/>'+
+   '<path d="M192 75 L208 77 L208 83 L192 85 Z" fill="#1c1c20"/><path d="M208 76.5 L236 80 L208 83.5 Z" fill="url(#gBrass)" stroke="#8c6b2e" stroke-width=".6"/><path d="M214 80 H232" stroke="#5a4020" stroke-width=".6"/><circle cx="217" cy="80" r="1" fill="#5a4020"/><rect x="96" y="76" width="96" height="2" fill="rgba(255,255,255,.25)"/></g>';
+  // ballpoints and pencil
+  h+='<g class="dwi" data-it="pens" tabindex="0" role="button" aria-label="Pens and a pencil" filter="url(#fSh)"><rect x="88" y="100" width="164" height="50" fill="transparent"/>'+
+   ['#2a5ad8','#c0302a'].map(function(c,i){var y=104+i*15;return '<rect x="98" y="'+y+'" width="106" height="8" rx="4" fill="'+c+'"/><rect x="98" y="'+(y+1)+'" width="106" height="2" fill="rgba(255,255,255,.3)"/><rect x="150" y="'+(y+2)+'" width="20" height="4" fill="rgba(255,255,255,.35)"/><rect x="160" y="'+(y+3)+'" width="8" height="2" fill="'+c+'"/><path d="M204 '+(y+.5)+' L216 '+(y+3)+' L216 '+(y+5)+' L204 '+(y+7.5)+' Z" fill="url(#gSteel)"/><circle cx="217" cy="'+(y+4)+'" r="1" fill="#2a2a2e"/><rect x="104" y="'+(y-3)+'" width="36" height="3" rx="1.5" fill="url(#gSteel)"/><rect x="94" y="'+(y+1)+'" width="5" height="6" rx="2" fill="url(#gSteel)"/>';}).join('')+
+   '<rect x="98" y="134" width="112" height="9" fill="#e8c020"/><rect x="98" y="134" width="112" height="3" fill="#f4d850"/><rect x="98" y="140" width="112" height="1" fill="#b89010"/><rect x="88" y="134" width="8" height="9" rx="2" fill="#e890a0"/><rect x="95" y="134" width="5" height="9" fill="url(#gSteel)"/><path d="M210 134 L226 138.5 L210 143 Z" fill="#e8c890"/><path d="M222 137.5 L227 138.5 L222 139.5 Z" fill="#2a2a2e"/><text x="140" y="141" font-family="Arial" font-size="5" fill="#2a2a2e">HB · 2</text></g>';
+  // magnifier
+  h+='<g class="dwi" data-it="mag" tabindex="0" role="button" aria-label="Magnifying glass" filter="url(#fSh)"><rect x="258" y="54" width="146" height="86" fill="transparent"/><rect x="318" y="110" width="74" height="13" rx="6" fill="#6b4527" transform="rotate(28 318 110)"/><rect x="318" y="111" width="74" height="4" rx="2" fill="rgba(255,255,255,.18)" transform="rotate(28 318 110)"/><rect x="312" y="108" width="14" height="13" fill="url(#gBrass)" transform="rotate(28 318 110)"/>'+
+   '<circle cx="296" cy="92" r="31" fill="url(#gGlass)"/><circle cx="296" cy="92" r="31" fill="none" stroke="url(#gBrass)" stroke-width="8"/><circle cx="296" cy="92" r="27" fill="none" stroke="#8c6b2e" stroke-width="1"/><path d="M276 80 Q286 68 304 70" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/><path d="M308 108 Q314 104 316 98" stroke="#fff" stroke-width="2" fill="none" opacity=".4"/></g>';
+  // lock-pick wallet
+  h+='<g class="dwi" data-it="picks" tabindex="0" role="button" aria-label="Lock pick set" filter="url(#fSh)"><rect x="408" y="54" width="126" height="100" fill="transparent"/><rect x="412" y="58" width="116" height="90" rx="7" fill="#4a2e18"/><rect x="416" y="62" width="108" height="82" rx="5" fill="none" stroke="#c9a867" stroke-width="1" stroke-dasharray="3 2"/><rect x="422" y="70" width="96" height="68" rx="3" fill="#6b4527"/>'+
+   [['hook','M0 0 v30 q0 5 4 5 q3 0 3 -3'],['rake','M0 0 v24 l3 3 l-3 3 l3 3 l-3 3'],['half-diamond','M0 0 v30 l4 -5 l0 7 z'],['ball','M0 0 v32 a3 3 0 1 0 0.1 0'],['wrench','M0 0 v36 h6']].map(function(p,i){var x=432+i*18;return '<rect x="'+(x-3)+'" y="76" width="7" height="18" rx="2" fill="#1c1c20"/><rect x="'+(x-2)+'" y="77" width="2" height="16" fill="#3a3a40"/><path d="'+p[1].replace('M0 0','M'+x+' 94')+'" stroke="url(#gSteel)" stroke-width="2.2" fill="none" stroke-linecap="round"/><rect x="'+(x-4)+'" y="96" width="9" height="3" rx="1" fill="#2a1a10" opacity=".5"/>';}).join('')+'</g>';
+  // flashlight
+  h+='<g class="dwi" data-it="torch" tabindex="0" role="button" aria-label="Flashlight" filter="url(#fSh)"><rect x="80" y="154" width="152" height="38" fill="transparent"/><rect x="86" y="164" width="98" height="18" rx="5" fill="url(#gBlack)"/>'+[0,1,2,3,4,5,6,7].map(function(i){return '<path d="M'+(98+i*6)+' 164 l3 18" stroke="#4a4a52" stroke-width="1.5"/>';}).join('')+'<rect x="146" y="160" width="10" height="5" rx="2" fill="#c0302a"/><rect x="182" y="159" width="30" height="28" rx="5" fill="url(#gBlack)"/><ellipse cx="212" cy="173" rx="5" ry="13" fill="url(#gSteel)"/><ellipse cx="212" cy="173" rx="3" ry="9" fill="#f4f8fa"/><ellipse cx="212" cy="173" rx="1.2" ry="3" fill="#ffe8a8"/><rect x="84" y="167" width="4" height="12" rx="2" fill="#2a2a2e"/><circle cx="82" cy="173" r="3" fill="none" stroke="url(#gSteel)" stroke-width="1.5"/></g>';
+  // sticky notes
+  h+='<g class="dwi" data-it="notes" tabindex="0" role="button" aria-label="Sticky notes" filter="url(#fSh)"><rect x="246" y="146" width="86" height="78" fill="transparent"/><rect x="258" y="154" width="64" height="62" fill="#d8b830" transform="rotate(-7 290 185)"/><rect x="256" y="152" width="64" height="62" fill="#e8c840" transform="rotate(-4 288 183)"/><path d="M254 150 H318 V204 Q300 214 254 212 Z" fill="#f6de66" transform="rotate(-1 286 181)"/><path d="M300 210 Q310 206 318 204 L318 212 Z" fill="#d8bc40" transform="rotate(-1 286 181)"/>'+
+   '<text x="260" y="168" font-family="Comic Sans MS, cursive" font-size="9.5" fill="#1e2a6a" transform="rotate(-1 286 181)">Felix: vet</text><text x="262" y="182" font-family="Comic Sans MS, cursive" font-size="9.5" fill="#1e2a6a" transform="rotate(-1 286 181)">Tuesday!!</text><path d="M262 185 q20 3 40 -1" stroke="#1e2a6a" fill="none" transform="rotate(-1 286 181)"/><text x="262" y="198" font-family="Comic Sans MS, cursive" font-size="7.5" fill="#c0302a" transform="rotate(-1 286 181)">don\'t tell him</text></g>';
+  // clips
+  h+='<g class="dwi" data-it="clips" tabindex="0" role="button" aria-label="Paper clips" filter="url(#fSh)"><rect x="336" y="148" width="74" height="64" fill="transparent"/>'+[[346,160,10],[372,172,-20],[350,188,35]].map(function(c){return '<path d="M'+c[0]+' '+c[1]+' h17 a4.5 4.5 0 0 1 0 9 h-15 a3.2 3.2 0 0 1 0 -6.4 h12" stroke="url(#gSteel)" stroke-width="1.7" fill="none" stroke-linecap="round" transform="rotate('+c[2]+' '+c[0]+' '+c[1]+')"/>';}).join('')+
+   '<path d="M382 166 L404 166 L400 178 L386 178 Z" fill="#141416"/><path d="M386 166 Q384 156 391 154 M400 166 Q402 156 395 154" stroke="url(#gSteel)" stroke-width="1.8" fill="none"/><ellipse cx="370" cy="204" rx="13" ry="5.5" fill="none" stroke="#c88a3a" stroke-width="1.6"/></g>';
+  // usb and cards
+  h+='<g class="dwi" data-it="usb" tabindex="0" role="button" aria-label="USB drive and memory cards" filter="url(#fSh)"><rect x="416" y="158" width="114" height="54" fill="transparent"/><rect x="422" y="172" width="46" height="17" rx="4" fill="url(#gBlack)"/><rect x="468" y="175" width="15" height="11" fill="url(#gSteel)"/><rect x="471" y="177" width="3" height="3" fill="#2a2a2e"/><rect x="477" y="177" width="3" height="3" fill="#2a2a2e"/><rect x="428" y="176" width="22" height="9" fill="#efe6cf"/><text x="439" y="183" text-anchor="middle" font-family="Arial" font-size="5" fill="#1c110a">KHN-07</text><circle cx="426" cy="180" r="2.5" fill="none" stroke="url(#gSteel)"/>'+
+   '<rect x="488" y="164" width="36" height="32" rx="4" fill="rgba(220,235,240,.55)" stroke="#8a8e94"/><path d="M494 170 h8 l2 2 v12 h-10 z" fill="#1c1c20"/><path d="M508 170 h8 l2 2 v12 h-10 z" fill="#1c1c20"/><rect x="495" y="176" width="7" height="3" fill="#2a5ad8"/><rect x="509" y="176" width="7" height="3" fill="#c0302a"/></g>';
+  // evidence tape
+  h+='<g class="dwi" data-it="tape" tabindex="0" role="button" aria-label="Evidence tape" filter="url(#fSh)"><rect x="438" y="212" width="96" height="74" fill="transparent"/><circle cx="480" cy="248" r="29" fill="#a8241e"/><circle cx="480" cy="248" r="26" fill="#c0302a"/>'+[20,23].map(function(r){return '<circle cx="480" cy="248" r="'+r+'" fill="none" stroke="rgba(0,0,0,.15)"/>';}).join('')+'<circle cx="480" cy="248" r="13" fill="#d8ccb0"/><circle cx="480" cy="248" r="10" fill="url(#pFelt)"/><text x="480" y="232" text-anchor="middle" font-family="Arial" font-weight="700" font-size="6.5" fill="#fff">EVIDENCE</text><text x="480" y="270" text-anchor="middle" font-family="Arial" font-weight="700" font-size="5" fill="#fff">DO NOT TAMPER</text><path d="M506 260 L532 274 L534 266 L508 252 Z" fill="#c0302a"/><text x="518" y="266" font-family="Arial" font-size="4.5" fill="#fff" transform="rotate(28 518 266)">EVIDE</text></g>';
+  // matchbook
+  h+='<g class="dwi" data-it="match" tabindex="0" role="button" aria-label="Matchbook" filter="url(#fSh)"><rect x="366" y="218" width="66" height="50" fill="transparent"/><g transform="rotate(8 398 242)"><rect x="374" y="226" width="48" height="32" rx="2" fill="#1e3a6a"/><rect x="374" y="226" width="48" height="10" fill="#16305a"/><rect x="374" y="252" width="48" height="6" fill="#5a4a3a"/><text x="398" y="246" text-anchor="middle" font-family="Georgia" font-style="italic" font-size="8" fill="#e8c860">Rosie\'s</text><text x="398" y="232" text-anchor="middle" font-family="Arial" font-size="4.5" fill="#c8d0e0">OPEN 24 HRS</text></g></g>';
+  // brass key (takeable)
+  if(!state.key)h+='<g class="dwi take" data-it="key" tabindex="0" role="button" aria-label="Brass key, take it" filter="url(#fSh)"><rect x="84" y="194" width="160" height="80" fill="transparent"/><path d="M90 192 l20 -9 l11 20 l-20 9 z" fill="#8a5a2a"/><path d="M93 194 l15 -7" stroke="#c9a867" stroke-width=".8" stroke-dasharray="2 1.5"/><text x="105" y="203" text-anchor="middle" font-family="Arial" font-weight="700" font-size="6.5" fill="#efe6cf" transform="rotate(-24 105 203)">CAB</text><circle cx="106" cy="214" r="10" fill="none" stroke="url(#gSteel)" stroke-width="2.4"/>'+
+   '<path d="M118 220 a17 17 0 1 0 0.1 0 z M118 228 a6 6 0 1 1 0.1 0 z" fill="url(#gBrass)" fill-rule="evenodd"/><path d="M106 226 q4 -8 12 -9" stroke="#fff6c8" stroke-width="1.5" fill="none" opacity=".7"/><rect x="133" y="232" width="74" height="9" fill="url(#gBrass)"/><rect x="133" y="233" width="74" height="2" fill="#fff6c8" opacity=".5"/><path d="M180 241 v6 h5 v-3 h5 v6 h5 v-4 h5 v5 h7 v-10" fill="url(#gBrass)"/><path d="M207 232 v9 l4 -4.5 z" fill="url(#gBrass)"/></g>';
+  for(var t=0;t<tubes;t++){var ty=210+t*22;h+='<g class="dwi take" data-it="churu" tabindex="0" role="button" aria-label="Churu, take it" filter="url(#fSh)"><rect x="248" y="'+(ty-4)+'" width="124" height="22" fill="transparent"/><path d="M256 '+ty+' H356 l6 7 l-6 7 H256 l3 -7 z" fill="#f4eef8"/><rect x="262" y="'+ty+'" width="60" height="14" fill="#7a3aa8"/><rect x="262" y="'+(ty+2)+'" width="60" height="2" fill="#9a5ac8"/><text x="292" y="'+(ty+10)+'" text-anchor="middle" font-family="Arial Black, Arial" font-size="7.5" fill="#fff">CHURU</text><text x="340" y="'+(ty+9)+'" text-anchor="middle" font-family="Arial" font-size="4.5" fill="#7a3aa8">TUNA</text>'+
+   '<circle cx="330" cy="'+(ty+7)+'" r="0" /><path d="M352 '+(ty+3)+' l3 2 l-3 2" stroke="#7a3aa8" stroke-width=".8" fill="none"/><path d="M256 '+ty+' l3 7 l-3 7" stroke="#c8b8d8" fill="none"/><rect x="258" y="'+(ty+12)+'" width="96" height="2" fill="rgba(0,0,0,.08)"/></g>';}
+  return h+'</svg>';}
+/* ---- the secure compartment: symbol wheels + cam key ---- */
+var SYM={spiral:'<path d="M12 12 m0 0 a2 2 0 1 1 2 -2 a4 4 0 1 1 -6 4 a6 6 0 1 1 10 -6" stroke="currentColor" stroke-width="2" fill="none"/>',
+ moon:'<path d="M15 3 A9 9 0 1 0 15 21 A11 11 0 0 1 15 3 Z" fill="currentColor"/>',
+ mush:'<path d="M3 12 a9 7 0 0 1 18 0 z" fill="currentColor"/><rect x="10" y="12" width="4" height="8" fill="currentColor"/>',
+ star:'<path d="M12 2 l2.6 6.6 l7 .4 l-5.4 4.4 l1.8 6.8 l-6 -3.8 l-6 3.8 l1.8 -6.8 l-5.4 -4.4 l7 -.4 z" fill="currentColor"/>',
+ leaf:'<path d="M4 20 C4 8 12 3 20 4 C20 14 14 20 4 20 Z M4 20 L14 10" stroke="currentColor" stroke-width="1.6" fill="none"/>',
+ drop:'<path d="M12 3 C16 9 18 12 18 15 a6 6 0 0 1 -12 0 C6 12 8 9 12 3 Z" fill="currentColor"/>',
+ flame:'<path d="M12 2 C14 7 18 9 18 14 a6 6 0 0 1 -12 0 C6 10 9 9 9 5 C11 8 12 7 12 2 Z" fill="currentColor"/>',
+ eye:'<path d="M2 12 Q12 3 22 12 Q12 21 2 12 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>',
+ tri:'<path d="M12 3 L21 20 H3 Z" stroke="currentColor" stroke-width="2" fill="none"/>',
+ spore:'<circle cx="7" cy="8" r="2.2" fill="currentColor"/><circle cx="16" cy="7" r="2" fill="currentColor"/><circle cx="12" cy="13" r="2.4" fill="currentColor"/><circle cx="6" cy="17" r="1.8" fill="currentColor"/><circle cx="17" cy="17" r="2.2" fill="currentColor"/>'};
+var SYM_ORDER=['star','leaf','spiral','drop','moon','flame','eye','mush','tri','spore'];
+var DECODE={0:'spiral',1:'mush',2:'leaf',3:'drop',4:'moon',5:'flame',6:'eye',7:'star',8:'tri',9:'spore'};
+function symSVG(k,sz){return '<svg viewBox="0 0 24 24" width="'+(sz||28)+'" height="'+(sz||28)+'" aria-hidden="true">'+SYM[k]+'</svg>';}
+function decoderHTML(){return '<div class="decoder"><div class="dctitle">CLIENT-CODE CARD · KEEP UNDER FLOOR</div><div class="dcgrid">'+Object.keys(DECODE).map(function(d){return '<div><b>'+d+'</b>'+symSVG(DECODE[d],26)+'</div>';}).join('')+'</div><div class="dcfoot">Translate the client\'s code digit by digit. Never write it in plain numbers.</div></div>';}
+state.wheels=state.wheels||[0,0,0,0];
+function renderHidden(){var box=document.getElementById('caseTab');if(!box)return;var C=state.case;
+  if(C.folder&&C.oldfile){box.innerHTML='<div class="sfile" style="margin-bottom:14px"><div class="sclip" aria-hidden="true"></div><div style="grid-column:1/-1"><div class="stab">LUMEN MYCOTECH · RECORDS SENT BY THE CEO</div><h4>Chain-of-custody and chromatography, sites 1 and 2</h4><div class="clue">Your note, clipped to the front: “The second spill is far too clean. The contaminant curve mirrors our exact degradation model. Whoever set it up had our baseline protocols and metabolic-rate data.”</div></div></div>'+oldFileHTML();return;}
+  var w=state.wheels,haveKey=!!state.inv.cabkey,haveCard=!!state.inv.decoder;
+  box.innerHTML='<p>A steel compartment at the back of the drawer. An engraved plate reads <b>CLIENT MATERIAL · LUMEN</b>. Four wheels show symbols, not numbers, and there\'s a cam lock beside them.</p>'+
+   '<div class="wheels">'+w.map(function(v,i){return '<div class="wh"><button class="pbtn" data-wu="'+i+'" aria-label="Wheel '+(i+1)+' up">▲</button><span class="wsym" aria-label="Wheel '+(i+1)+': '+SYM_ORDER[v]+'">'+symSVG(SYM_ORDER[v],34)+'</span><button class="pbtn" data-wd="'+i+'" aria-label="Wheel '+(i+1)+' down">▼</button></div>';}).join('')+
+   '<div class="cam"><div class="keyhole'+(haveKey?' ready':'')+'"></div><button class="pbtn" id="turnCam">'+(haveKey?'TURN THE CAM KEY':'NO KEY')+'</button></div></div>'+
+   (haveCard?'<details class="dcwrap"><summary>LOOK AT THE CODE CARD FROM THE FLOORBOARD</summary>'+decoderHTML()+'</details>':'<p class="dim2">The symbols must stand for something. Somewhere there\'s a key to them, and a key for the lock.</p>')+'<p class="dim2" id="camMsg"></p>';
+  box.querySelectorAll('[data-wu]').forEach(function(b2){b2.addEventListener('click',function(){var i=+b2.dataset.wu;state.wheels[i]=(state.wheels[i]+1)%10;renderHidden();var nb=document.querySelector('[data-wu="'+i+'"]');if(nb)nb.focus();});});
+  box.querySelectorAll('[data-wd]').forEach(function(b2){b2.addEventListener('click',function(){var i=+b2.dataset.wd;state.wheels[i]=(state.wheels[i]+9)%10;renderHidden();var nb=document.querySelector('[data-wd="'+i+'"]');if(nb)nb.focus();});});
+  document.getElementById('turnCam').addEventListener('click',function(){var m=document.getElementById('camMsg');
+    if(!haveKey){m.textContent='You need a small cam key for this lock.';return;}
+    var want=['0','4','1','7'].map(function(d){return DECODE[d];}),got=state.wheels.map(function(v){return SYM_ORDER[v];});
+    if(want.join()!==got.join()){m.textContent='The key turns a quarter-inch and stops. The wheels aren\'t right.';speak('Not the right code.');return;}
+    openCompartment();});}
+function openCompartment(){var C=state.case;caseStep('folder','The secure compartment: Lumen\'s chain-of-custody and chromatography. The second spill is too clean.');state.inv.cabkey=null;state.inv.decoder=null;renderInv();
+  C.oldfile=true;state.sus.ruled.reyes=true;addNote('2023 Lumen file: only Halloran and Okafor hold research stock (Reyes crossed off). Their stocks fruit amber-gold vs. blue-gray.');
+  say('The wheels line up, the cam key turns, and the compartment opens.');speak('Spiral, moon, mushroom, star. 0417.');renderHidden();tryReveal();
+  var w2=document.getElementById('cbWrap');if(w2){w2.innerHTML=cabinetSVG('HIDDEN DRAWER');w2.querySelectorAll('.cbi').forEach(function(g3){g3.addEventListener('click',function(){showFolder(g3.dataset.f);});});}}
+/* floorboard now holds the cam key and the code card */
+function openLockbox(){if(!state.case.lockbox){caseStep('lockbox','Under the floorboard: a cam key and a client-code card for the filing cabinet\'s secure compartment.');state.inv.cabkey=true;state.inv.decoder=true;renderInv();}
+  openModal('UNDER THE FLOORBOARD','<p>You lift the board and reach down between the joists for the steel lockbox you hid here years ago. Inside:</p><ul><li><b>A small cam key</b> on a paper tag: <i>FILING CABINET, BACK COMPARTMENT</i></li><li><b>A laminated code card</b> that turns digits into symbols, for client codes you never write down plainly</li><li><b>A note in your handwriting:</b> "Lumen file, 2023, is in there too. Might come in handy someday."</li></ul>'+decoderHTML());say('A cam key and the code card.');speak('Past me, you beautiful paranoid genius.');}
+INV2.decoder=['Code card','Turns client codes into symbols. Click to look.'];ICOL.decoder='#efe6cf';
+var _il14=invList;invList=function(){var L=_il14();if(state.inv.decoder)L.push('decoder');return L;};
+document.getElementById('pack').addEventListener('click',function(e){var b2=e.target.closest('[data-item="decoder"]');if(b2)setTimeout(function(){openModal('CODE CARD',decoderHTML());},0);},true);
+/* cabinet: the red folder is gone; everything Lumen lives in the compartment */
+for(var cf=CAB_FOLDERS.length-1;cf>=0;cf--)if(CAB_FOLDERS[cf].k==='LUMEN CASE')CAB_FOLDERS.splice(cf,1);
+var _cabEx=cabinetExamine;cabinetExamine=function(o){if(o.id==='cabinet'&&state.key){log(o);done('cabinet');pin('casework');openCabinetDrawer(state.case.letter&&!state.case.oldfile?'HIDDEN DRAWER':null);say('The brass key turns.');return true;}return _cabEx(o);};
+CASE_STEPS=[['letter','Read the CEO\'s letter and the four files'],['telemetry','Run phone telemetry on the laptop'],['whois','Find out who owns site 2'],['globe','Pass the globe test (the last answer is the shell company\'s jurisdiction)'],['lockbox','Open the floorboard in the middle of the living room'],['folder','Open the secure compartment in the filing cabinet'],['oldfile','Read Laura\'s 2023 Lumen file'],['soil','Model how the second spill got into the soil'],['journal','Finish the lab whiteboard with your inoculation notes'],['strain','Grow the site 2 sample all the way to fruit'],['travel','Work out how the strain left the building'],['sealed','Seal the evidence for chain of custody']];
+CLUE.folder.hint='Locked in the filing cabinet\'s secure compartment.';CLUE.oldfile.hint='Also in the secure compartment.';CLUE.lockbox.title='A key and a code card';CLUE.lockbox.body='Your old stash: a cam key for the filing cabinet\'s secure compartment, and a laminated card that turns client codes into symbols.';
+
+/* ===================== V15: shower before surgery, a phone camera, fullscreen ===================== */
+/* ---- shower ---- */
+state.showered=state.showered||false;
+var showering=false;
+function showerNoise(ms){try{var out=sfxOut(),t=ac.currentTime+.05,src=ac.createBufferSource(),bp=ac.createBiquadFilter(),hp=ac.createBiquadFilter(),gn=ac.createGain();src.buffer=noiseBuf;src.loop=true;bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=.5;hp.type='highpass';hp.frequency.value=600;
+  gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(.35,t+.6);gn.gain.setValueAtTime(.35,t+ms/1000-.9);gn.gain.linearRampToValueAtTime(0,t+ms/1000);src.connect(hp);hp.connect(bp);bp.connect(gn);gn.connect(out);src.start(t);src.stop(t+ms/1000+.1);
+  for(var i=0;i<14;i++){var o=ac.createOscillator(),g2=ac.createGain(),tt=t+.4+Math.random()*(ms/1000-1);o.type='sine';o.frequency.setValueAtTime(900+Math.random()*900,tt);o.frequency.exponentialRampToValueAtTime(300,tt+.06);g2.gain.setValueAtTime(.04,tt);g2.gain.exponentialRampToValueAtTime(.001,tt+.08);o.connect(g2);g2.connect(out);o.start(tt);o.stop(tt+.1);}}catch(e){}}
+function takeShower(){if(showering)return;showering=true;var ms=5000;state.bed.shower=true;say('Laura steps into the shower.');showerNoise(ms);
+  var ov=document.getElementById('showerFade');ov.classList.add('on');keys={};
+  setTimeout(function(){ov.classList.remove('on');state.bed.shower=false;state.showered=true;showering=false;say('Scrubbed to the elbows, hair tied back. Clean enough for sterile work.');speak('Okay. Now I can cut.');addNote('Showered: clean enough for tissue work in the still air box.');},ms);}
+var _bedEx15=bedExamine;bedExamine=function(o){if(o.id==='bshower'){if(state.showered){say('Still clean from the last shower.');speak('Already squeaky clean.');}else takeShower();return true;}return _bedEx15(o);};
+var _clone15=cloneScene;
+cloneScene=function(){if(!state.showered){closeModal();say('Laura looks at her hands, then at the mushroom.');speak('I have to clean up first. Shower, then the still air box.');addNote('Shower before cutting any mushroom tissue (bathroom).');return;}_clone15();};
+var _wb15=wbDone;wbDone=function(k,msg){_wb15(k,msg);if(k==='tissue')state.showered=false;};
+/* ---- phones: zoomed-in camera that follows Laura, a dimmer joystick, fullscreen ---- */
+setTimeout(function(){if(IS_MOBILE)(function(){var wrap=document.getElementById('stageWrap'),Z=1.6,cam={x:null,y:null};
+  function goFull(){var d=document.documentElement;if(document.fullscreenElement||document.webkitFullscreenElement)return;var rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq){try{var pr=rq.call(d,{navigationUI:'hide'});if(pr&&pr.then)pr.then(function(){try{screen.orientation.lock('landscape');}catch(e){}}).catch(function(){});}catch(e){}}window.scrollTo(0,1);}
+  addEventListener('pointerdown',function f(){goFull();},{passive:true});
+  var fb=document.createElement('button');fb.className='pbtn';fb.id='fullBtn';fb.textContent='FULL SCREEN';fb.addEventListener('click',goFull);document.querySelector('header').appendChild(fb);
+  (function loop(){var w=wrap.clientWidth,h=wrap.clientHeight;if(w&&h){var s=Math.min(w/W,h/H)*Z,cw=Math.round(W*s),ch=Math.round(H*s);
+      if(cv.style.width!==cw+'px'){cv.style.width=cw+'px';cv.style.height=ch+'px';}
+      var tx=w/2-P.x*s,ty=h/2-(P.y-40)*s;tx=Math.min(0,Math.max(w-cw,tx));ty=Math.min(0,Math.max(h-ch,ty));if(cw<w)tx=(w-cw)/2;if(ch<h)ty=(h-ch)/2;
+      if(cam.x===null){cam.x=tx;cam.y=ty;}cam.x+=(tx-cam.x)*.15;cam.y+=(ty-cam.y)*.15;cv.style.transform='translate('+Math.round(cam.x)+'px,'+Math.round(cam.y)+'px)';}
+    requestAnimationFrame(loop);})();})();},0);
 
 var hadSave=loadGame();
 /* ===================== V11: phones, landscape only ===================== */
